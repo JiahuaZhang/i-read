@@ -1,20 +1,21 @@
-# Remix Grunge Stack
+# Remix Blues Stack
 
-![The Remix Grunge Stack](https://repository-images.githubusercontent.com/463325363/edae4f5b-1a13-47ea-b90c-c05badc2a700)
+![The Remix Blues Stack](https://repository-images.githubusercontent.com/461012689/37d5bd8b-fa9c-4ab0-893c-f0a199d5012d)
 
 Learn more about [Remix Stacks](https://remix.run/stacks).
 
 ```
-npx create-remix --template remix-run/grunge-stack
+npx create-remix --template remix-run/blues-stack
 ```
 
 ## What's in the stack
 
-- [AWS deployment](https://aws.com) with [Architect](https://arc.codes/)
-- Production-ready [DynamoDB Database](https://aws.amazon.com/dynamodb/)
+- [Multi-region Fly app deployment](https://fly.io/docs/reference/scaling/) with [Docker](https://www.docker.com/)
+- [Multi-region Fly PostgreSQL Cluster](https://fly.io/docs/getting-started/multi-region-databases/)
+- Healthcheck endpoint for [Fly backups region fallbacks](https://fly.io/docs/reference/configuration/#services-http_checks)
 - [GitHub Actions](https://github.com/features/actions) for deploy on merge to production and staging environments
 - Email/Password Authentication with [cookie-based sessions](https://remix.run/docs/en/v1/api/remix#createcookiesessionstorage)
-- DynamoDB access via [`arc.tables`](https://arc.codes/docs/en/reference/runtime-helpers/node.js#arc.tables)
+- Database ORM with [Prisma](https://prisma.io)
 - Styling with [Tailwind](https://tailwindcss.com/)
 - End-to-end testing with [Cypress](https://cypress.io)
 - Local third party request mocking with [MSW](https://mswjs.io)
@@ -27,10 +28,24 @@ Not a fan of bits of the stack? Fork it, change it, and use `npx create-remix --
 
 ## Development
 
-- Validate the app has been set up properly (optional):
+- Start the Postgres Database in [Docker](https://www.docker.com/get-started):
 
   ```sh
-  npm run validate
+  npm run docker
+  ```
+
+  > **Note:** The npm script will complete while Docker sets up the container in the background. Ensure that Docker has finished and your container is running before proceeding.
+
+- Initial setup:
+
+  ```sh
+  npm run setup
+  ```
+
+- Run the first build:
+
+  ```sh
+  npm run build
   ```
 
 - Start dev server:
@@ -41,44 +56,104 @@ Not a fan of bits of the stack? Fork it, change it, and use `npx create-remix --
 
 This starts your app in development mode, rebuilding assets on file changes.
 
+The database seed script creates a new user with some data you can use to get started:
+
+- Email: `rachel@remix.run`
+- Password: `racheliscool`
+
+If you'd prefer not to use Docker, you can also use Fly's Wireguard VPN to connect to a development database (or even your production database). You can find the instructions to set up Wireguard [here](https://fly.io/docs/reference/private-networking/#install-your-wireguard-app), and the instructions for creating a development database [here](https://fly.io/docs/reference/postgres/).
+
 ### Relevant code:
 
-This is a pretty simple note-taking app, but it's a good example of how you can build a full stack app with Architect and Remix. The main functionality is creating users, logging in and out, and creating and deleting notes.
+This is a pretty simple note-taking app, but it's a good example of how you can build a full stack app with Prisma and Remix. The main functionality is creating users, logging in and out, and creating and deleting notes.
 
 - creating users, and logging in and out [./app/models/user.server.ts](./app/models/user.server.ts)
 - user sessions, and verifying them [./app/session.server.ts](./app/session.server.ts)
 - creating, and deleting notes [./app/models/note.server.ts](./app/models/note.server.ts)
 
-The database that comes with `arc sandbox` is an in memory database, so if you restart the server, you'll lose your data. The Staging and Production environments won't behave this way, instead they'll persist the data in DynamoDB between deployments and Lambda executions.
-
 ## Deployment
 
-This Remix Stack comes with two GitHub Actions that handle automatically deploying your app to production and staging environments. By default, Arc will deploy to the `us-west-2` region, if you wish to deploy to a different region, you'll need to change your [`app.arc`](https://arc.codes/docs/en/reference/project-manifest/aws)
+This Remix Stack comes with two GitHub Actions that handle automatically deploying your app to production and staging environments.
 
 Prior to your first deployment, you'll need to do a few things:
 
-- Create a new [GitHub repo](https://repo.new)
+- [Install Fly](https://fly.io/docs/getting-started/installing-flyctl/)
 
-- [Sign up](https://portal.aws.amazon.com/billing/signup#/start) and login to your AWS account
-
-- Add `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY` to [your GitHub repo's secrets](https://docs.github.com/en/actions/security-guides/encrypted-secrets). Go to your AWS [security credentials](https://console.aws.amazon.com/iam/home?region=us-west-2#/security_credentials) and click on the "Access keys" tab, and then click "Create New Access Key", then you can copy those and add them to your repo's secrets.
-
-- Along with your AWS credentials, you'll also need to give your CloudFormation a `SESSION_SECRET` variable of its own for both staging and production environments, as well as an `ARC_APP_SECRET` for Arc itself.
+- Sign up and log in to Fly
 
   ```sh
-  npx arc env --add --env staging ARC_APP_SECRET $(openssl rand -hex 32)
-  npx arc env --add --env staging SESSION_SECRET $(openssl rand -hex 32)
-  npx arc env --add --env production ARC_APP_SECRET $(openssl rand -hex 32)
-  npx arc env --add --env production SESSION_SECRET $(openssl rand -hex 32)
+  fly auth signup
   ```
 
-  If you don't have openssl installed, you can also use [1password](https://1password.com/password-generator) to generate a random secret, just replace `$(openssl rand -hex 32)` with the generated secret.
+  > **Note:** If you have more than one Fly account, ensure that you are signed into the same account in the Fly CLI as you are in the browser. In your terminal, run `fly auth whoami` and ensure the email matches the Fly account signed into the browser.
 
-## Where do I find my CloudFormation?
+- Create two apps on Fly, one for staging and one for production:
 
-You can find the CloudFormation template that Architect generated for you in the sam.yaml file.
+  ```sh
+  fly create i-read-on-cloud-f18e
+  fly create i-read-on-cloud-f18e-staging
+  ```
 
-To find it on AWS, you can search for [CloudFormation](https://console.aws.amazon.com/cloudformation/home) (make sure you're looking at the correct region!) and find the name of your stack (the name is a PascalCased version of what you have in `app.arc`, so by default it's ExploreF375Staging and ExploreF375Production) that matches what's in `app.arc`, you can find all of your app's resources under the "Resources" tab.
+- Initialize Git.
+
+  ```sh
+  git init
+  ```
+
+- Create a new [GitHub Repository](https://repo.new), and then add it as the remote for your project. **Do not push your app yet!**
+
+  ```sh
+  git remote add origin <ORIGIN_URL>
+  ```
+
+- Add a `FLY_API_TOKEN` to your GitHub repo. To do this, go to your user settings on Fly and create a new [token](https://web.fly.io/user/personal_access_tokens/new), then add it to [your repo secrets](https://docs.github.com/en/actions/security-guides/encrypted-secrets) with the name `FLY_API_TOKEN`.
+
+- Add a `SESSION_SECRET` to your fly app secrets, to do this you can run the following commands:
+
+  ```sh
+  fly secrets set SESSION_SECRET=$(openssl rand -hex 32) --app i-read-on-cloud-f18e
+  fly secrets set SESSION_SECRET=$(openssl rand -hex 32) --app i-read-on-cloud-f18e-staging
+  ```
+
+  > **Note:** When creating the staging secret, you may get a warning from the Fly CLI that looks like this:
+  >
+  > ```
+  > WARN app flag 'i-read-on-cloud-f18e-staging' does not match app name in config file 'i-read-on-cloud-f18e'
+  > ```
+  >
+  > This simply means that the current directory contains a config that references the production app we created in the first step. Ignore this warning and proceed to create the secret.
+
+  If you don't have openssl installed, you can also use [1password](https://1password.com/generate-password) to generate a random secret, just replace `$(openssl rand -hex 32)` with the generated secret.
+
+- Create a database for both your staging and production environments. Run the following:
+
+  ```sh
+  fly postgres create --name i-read-on-cloud-f18e-db
+  fly postgres attach --postgres-app i-read-on-cloud-f18e-db --app i-read-on-cloud-f18e
+
+  fly postgres create --name i-read-on-cloud-f18e-staging-db
+  fly postgres attach --postgres-app i-read-on-cloud-f18e-staging-db --app i-read-on-cloud-f18e-staging
+  ```
+
+  > **Note:** You'll get the same warning for the same reason when attaching the staging database that you did in the `fly set secret` step above. No worries. Proceed!
+
+Fly will take care of setting the `DATABASE_URL` secret for you.
+
+Now that every is set up you can commit and push your changes to your repo. Every commit to your `main` branch will trigger a deployment to your production environment, and every commit to your `dev` branch will trigger a deployment to your staging environment.
+
+If you run into any issues deploying to Fly, make sure you've followed all of the steps above and if you have, then post as many details about your deployment (including your app name) to [the Fly support community](https://community.fly.io). They're normally pretty responsive over there and hopefully can help resolve any of your deployment issues and questions.
+
+### Multi-region deploys
+
+Once you have your site and database running in a single region, you can add more regions by following [Fly's Scaling](https://fly.io/docs/reference/scaling/) and [Multi-region PostgreSQL](https://fly.io/docs/getting-started/multi-region-databases/) docs.
+
+Make certain to set a `PRIMARY_REGION` environment variable for your app. You can use `[env]` config in the `fly.toml` to set that to the region you want to use as the primary region for both your app and database.
+
+#### Testing your app in other regions
+
+Install the [ModHeader](https://modheader.com/) browser extension (or something similar) and use it to load your app with the header `fly-prefer-region` set to the region name you would like to test.
+
+You can check the `x-fly-region` header on the response to know which region your request was handled by.
 
 ## GitHub Actions
 
