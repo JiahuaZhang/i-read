@@ -1,4 +1,5 @@
-import { LoaderFunction, useLoaderData } from "remix";
+import type EPub from "epub";
+import { type LoaderFunction, useLoaderData, Link } from "remix";
 import { testSingleEpub } from "~/utils/google.drive";
 
 export const loader: LoaderFunction = async () => {
@@ -7,9 +8,21 @@ export const loader: LoaderFunction = async () => {
 };
 
 const GoogleDrive = () => {
-  const epub = useLoaderData();
+  const epub = useLoaderData<EPub>();
 
-  return <div>Test page</div>;
+  console.log(epub);
+
+  return (
+    <div>
+      <ul>
+        {epub.flow.map((flow) => (
+          <li key={flow.id}>
+            <Link to={`/quick/${flow.id}`}>{flow.id}</Link>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
 };
 
 export default GoogleDrive;

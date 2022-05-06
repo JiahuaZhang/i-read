@@ -5,6 +5,8 @@ import os from 'os';
 import { v4 } from 'uuid';
 import credentials from '../../credentials.json';
 import EPub from 'epub';
+import parse from 'node-html-parser';
+import { type RawAttributes } from 'node-html-parser/dist/nodes/html';
 
 // https://www.google.com/search?q=esm+declare+global+variable&oq=esm+declare+global+vari&aqs=chrome.1.69i57j33i160j33i299.4647j0j9&sourceid=chrome&ie=UTF-8
 
@@ -34,26 +36,27 @@ export const testDrive = () => {
   });
 };
 
-// var fileId: string;
-// var epub: EPub;
-export const testSingleEpub = () => new Promise<EPub>((res, rej) => {
-  // if (fileId && epub) {
-  //   console.log('quick return');
-  //   res(epub);
-  // } else {
-  //   console.log('not quick return');
-  // }
+declare global {
+  var cache: {
+    filedId?: string;
+    epub?: EPub;
+  };
+}
 
-  if (global.fileId && global.epub) {
+if (!global.cache) {
+  global.cache = {};
+}
+
+export const testSingleEpub = async () => new Promise<EPub>((res, rej) => {
+  if (global.cache.filedId && global.cache.epub) {
     console.log('quick return');
-    res(global.epub);
-  } else {
-    console.log('global', global.filedId, global.epub);
+    res(global.cache.epub);
+    return;
   }
 
   console.log('not quick return');
   const fileId = '1eUKzPZles1YrZqCT3-CXawsBXn110rBd';
-  global.fileId = fileId;
+  global.cache.filedId = fileId;
   drive.files.get({ fileId, alt: 'media' }, { responseType: 'stream' }).then(response => {
 
     const filepath = path.join(os.tmpdir(), v4());
@@ -61,42 +64,12 @@ export const testSingleEpub = () => new Promise<EPub>((res, rej) => {
 
     // https://github.com/julien-c/epub
     response.data
-      // .on('close', () => {
-      //   console.log('successfully close');
-      // })
       .on('end', async () => {
-        // console.log('successfully end');
-
         const epub = new EPub(filepath);
+        global.cache.epub = epub;
 
         epub.on('end', () => {
-          // global.epub = epub;
-          // console.log('set global', global.fileId, global.epub);
           res(epub);
-          // console.log(epub.metadata);
-          // console.log(epub.manifest);
-          // console.log(epub.spine);
-          // console.log(epub.toc);
-
-          // console.log(epub.flow);
-
-          // epub.getImage('image_05725f1e28544823a24f5662c14864ee.jpg', (error, img, mimetype) => {
-          //   if (error) throw error;
-
-          //   console.log({ img, mimetype });
-          // });
-
-          // epub.getChapterRaw(epub.flow[0].id, (err, text) => {
-          //   if (err) throw err;
-
-          //   console.log(text);
-          // });
-
-          // epub.getChapter(epub.flow[0].id, (err, text) => {
-          //   if (err) throw err;
-
-          //   console.log(text);
-          // });
         });
 
         epub.parse();
@@ -105,3 +78,62 @@ export const testSingleEpub = () => new Promise<EPub>((res, rej) => {
 
   });
 });
+
+const getImageAsBase64 = async (epub: EPub, path: string) => {
+  path = path.replace('../', '');
+  const value = Object.values(epub.manifest).find((manifest) =>
+    manifest.href.includes(path)
+  );
+  const { id } = value;
+
+  const imageBuffer = await new Promise<Buffer>((res) => {
+    epub.getImage(id, (err, data) => {
+      res(data);
+    });
+  });
+
+  return Buffer.from(imageBuffer).toString("base64");
+};
+
+export const getEPubChater = async (epub: EPub, flow: string) => {
+  const text = await new Promise<string>((res) => {
+    epub.getChapterRaw(flow, (err, text) => {
+      res(text);
+    });
+  });
+
+  const root = parse(text);
+
+  const resolveImage = async (rawAttributes: RawAttributes) => {
+    const xlink = rawAttributes['xlink:href'];
+    if (!xlink) return rawAttributes;
+
+    const base64 = await getImageAsBase64(epub, xlink);
+    delete rawAttributes['xlink:href'];
+    rawAttributes['href'] = `data:image/jpeg;base64,${base64}`;
+    return rawAttributes;
+  };
+
+  const resolveImg = async (rawAttributes: RawAttributes) => {
+    const src = rawAttributes.src;
+    if (!src) return rawAttributes;
+
+    const base64 = await getImageAsBase64(epub, src);
+    rawAttributes.src = `data:image/jpeg;base64,${base64}`;
+    return rawAttributes;
+  };
+
+  const images = root.querySelectorAll("image");
+  for (const image of images) {
+    const { rawAttributes } = image;
+    image.setAttributes(await resolveImage(rawAttributes));
+  }
+
+  const imgs = root.querySelectorAll('img');
+  for (const img of imgs) {
+    const { rawAttributes } = img;
+    img.setAttributes(await resolveImg(rawAttributes));
+  }
+
+  return root.toString();
+};
