@@ -79,13 +79,16 @@ export const testSingleEpub = async () => new Promise<EPub>((res, rej) => {
   });
 });
 
-const getImageAsBase64 = async (epub: EPub, path: string) => {
-  path = path.replace('../', '');
+const path2id = async (epub: EPub, path: string) => {
+  path = path.replace(/\.\.\//g, '');
   const value = Object.values(epub.manifest).find((manifest) =>
     manifest.href.includes(path)
   );
-  const { id } = value;
+  return value.id;
+};
 
+const getImageAsBase64 = async (epub: EPub, path: string) => {
+  const id = await path2id(epub, path);
   const imageBuffer = await new Promise<Buffer>((res) => {
     epub.getImage(id, (err, data) => {
       res(data);
@@ -102,7 +105,7 @@ export const getEPubChater = async (epub: EPub, flow: string) => {
     });
   });
 
-  const root = parse(text);
+  let root = parse(text);
 
   const resolveImage = async (rawAttributes: RawAttributes) => {
     const xlink = rawAttributes['xlink:href'];
@@ -123,6 +126,20 @@ export const getEPubChater = async (epub: EPub, flow: string) => {
     return rawAttributes;
   };
 
+  const resolveCss = async (rawAttributes: RawAttributes) => {
+    if (rawAttributes.rel !== 'stylesheet') return '';
+
+    const id = await path2id(epub, rawAttributes.href);
+
+    const buffer = await new Promise<Buffer>(res => {
+      epub.getFile(id, (err, data) => {
+        res(data);
+      });
+    });
+
+    return `<style>${Buffer.from(buffer).toString()}</style>`;
+  };
+
   const images = root.querySelectorAll("image");
   for (const image of images) {
     const { rawAttributes } = image;
@@ -135,5 +152,28 @@ export const getEPubChater = async (epub: EPub, flow: string) => {
     img.setAttributes(await resolveImg(rawAttributes));
   }
 
+  const links = root.querySelectorAll('link');
+  for (const css of links) {
+    const { attributes } = css;
+    const newNode = parse(await resolveCss(attributes));
+    css.replaceWith(newNode);
+  }
+
   return root.toString();
+};
+
+export const getEPubToc = async (epub: EPub, id: string) => {
+  console.log({ id });
+
+  epub.getFile('ncx', (err, text) => {
+    if (err) {
+      console.log('fail get chapter');
+    }
+
+    // console.log(text);
+    const buffer = Buffer.from(text).toString();
+    console.log(buffer);
+  });
+
+  return '';
 };

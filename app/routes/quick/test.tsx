@@ -21,6 +21,14 @@ const GoogleDrive = () => {
           </li>
         ))}
       </ul>
+
+      <ul>
+        {epub.toc.map((content) => (
+          <li key={content.id}>
+            <Link to={`/quick/toc/${content.id}`}> {content.id} </Link>
+          </li>
+        ))}
+      </ul>
     </div>
   );
 };
