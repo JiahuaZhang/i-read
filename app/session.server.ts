@@ -1,7 +1,7 @@
 import { createCookieSessionStorage, redirect } from "@remix-run/node";
 import invariant from "tiny-invariant";
 
-import { getUserById } from "~/models/user.server";
+import { getUserFromJwt, isValid } from './utils/google.user';
 
 invariant(process.env.SESSION_SECRET, "SESSION_SECRET must be set");
 
@@ -34,10 +34,10 @@ export async function getUser(request: Request) {
   const userId = await getUserId(request);
   if (userId === undefined) return null;
 
-  const user = await getUserById(userId);
-  if (user) return user;
+  const user = getUserFromJwt(userId);
+  if (user && isValid(user)) return user;
 
-  throw await logout(request);
+  return null;
 }
 
 export async function requireUserId(
@@ -55,7 +55,7 @@ export async function requireUserId(
 export async function requireUser(request: Request) {
   const userId = await requireUserId(request);
 
-  const user = await getUserById(userId);
+  const user = getUserFromJwt(userId);
   if (user) return user;
 
   throw await logout(request);
@@ -84,6 +84,26 @@ export async function createUserSession({
     },
   });
 }
+
+export const login = async ({
+  request, userId, remember = false, redirectTo = ''
+}: {
+  request: Request; userId: string;
+  remember?: boolean; redirectTo?: string;
+}) => {
+  console.log('called login');
+  const session = await getSession(request);
+  session.set(USER_SESSION_KEY, userId);
+  return redirect(redirectTo, {
+    headers: {
+      "Set-Cookie": await sessionStorage.commitSession(session, {
+        maxAge: remember
+          ? 60 * 60 * 24 * 7 // 7 days
+          : undefined,
+      }),
+    },
+  });
+};
 
 export async function logout(request: Request) {
   const session = await getSession(request);

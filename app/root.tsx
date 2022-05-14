@@ -11,10 +11,12 @@ import {
   Outlet,
   Scripts,
   ScrollRestoration,
+  useLoaderData,
 } from "@remix-run/react";
 
 import tailwindStylesheetUrl from "./styles/tailwind.css";
 import { getUser } from "./session.server";
+import { GoogleOAuthProvider, useGoogleOneTapLogin } from "@react-oauth/google";
 
 export const links: LinksFunction = () => {
   return [{ rel: "stylesheet", href: tailwindStylesheetUrl }];
@@ -31,12 +33,15 @@ type LoaderData = {
 };
 
 export const loader: LoaderFunction = async ({ request }) => {
-  return json<LoaderData>({
-    user: await getUser(request),
-  });
+  return process.env.GOOGLE_CLIENT_ID;
+  // return json<LoaderData>({
+  //   user: await getUser(request),
+  // });
 };
 
 export default function App() {
+  const clientId = useLoaderData();
+
   return (
     <html lang="en" className="h-full">
       <head>
@@ -44,7 +49,9 @@ export default function App() {
         <Links />
       </head>
       <body className="h-full">
-        <Outlet />
+        <GoogleOAuthProvider clientId={clientId}>
+          <Outlet />
+        </GoogleOAuthProvider>
         <ScrollRestoration />
         <Scripts />
         <LiveReload />
