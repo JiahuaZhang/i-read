@@ -5,7 +5,7 @@ import { login } from "~/session.server";
 export const action: ActionFunction = async ({ request }) => {
   const formData = await request.formData();
   const credential = formData.get("credential") as string;
-  return login({ request, userId: credential });
+  return login({ request, jwt: credential });
 };
 
 const Login = () => {

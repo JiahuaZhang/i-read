@@ -11,3 +11,4 @@ node_modules
 /app/styles/tailwind.css
 
 credentials.json
+oauth2.keys.json.json
