@@ -1,15 +1,19 @@
 import { GoogleLogin } from "@react-oauth/google";
-import { type ActionFunction, useSubmit } from "remix";
+import { type ActionFunction, useSubmit, useSearchParams } from "remix";
 import { login } from "~/session.server";
 
 export const action: ActionFunction = async ({ request }) => {
   const formData = await request.formData();
   const credential = formData.get("credential") as string;
-  return login({ request, jwt: credential });
+  const redirectTo = formData.get("redirectTo") as string;
+
+  return login({ request, jwt: credential, redirectTo });
 };
 
 const Login = () => {
   const submit = useSubmit();
+  const [searchParams] = useSearchParams();
+  const redirectTo = searchParams.get("redirectTo") || "/";
 
   return (
     <div className="pt-20">
@@ -18,7 +22,7 @@ const Login = () => {
           auto_select
           onSuccess={async (credentialResponse) => {
             const { credential = "" } = credentialResponse;
-            submit({ credential }, { method: "post" });
+            submit({ redirectTo, credential }, { method: "post" });
           }}
         />
       </div>

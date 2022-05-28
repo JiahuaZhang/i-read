@@ -80,7 +80,7 @@ export async function createUserSession({
 }
 
 export const login = async ({
-  request, jwt, remember = true, redirectTo = ''
+  request, jwt, remember = true, redirectTo = '/'
 }: {
   request: Request; jwt: string;
   remember?: boolean; redirectTo?: string;
