@@ -1,7 +1,7 @@
 import { createCookieSessionStorage, redirect } from "@remix-run/node";
 import invariant from "tiny-invariant";
 
-import { getUserFromJwt } from './utils/google.user';
+import { type GoogleUser } from './utils/google.user';
 
 invariant(process.env.SESSION_SECRET, "SESSION_SECRET must be set");
 
@@ -24,50 +24,36 @@ export async function getSession(request: Request) {
   return sessionStorage.getSession(cookie);
 }
 
-export async function getJwt(request: Request): Promise<string | undefined> {
+export async function getUser(request: Request): Promise<GoogleUser | undefined> {
   const session = await getSession(request);
-  const jwt = session.get(USER_SESSION_KEY);
-  return jwt;
-}
-
-export async function getUser(request: Request) {
-  const userId = await getJwt(request);
-  if (!userId) return null;
-
-  return getUserFromJwt(userId);
-}
-
-export async function requireJwt(
-  request: Request,
-  redirectTo: string = new URL(request.url).pathname
-) {
-  const jwt = await getJwt(request);
-  if (!jwt) {
-    const searchParams = new URLSearchParams([["redirectTo", redirectTo]]);
-    throw redirect(`/login?${searchParams}`);
-  }
-  return jwt;
+  return session.get(USER_SESSION_KEY);
 }
 
 export async function requireUser(request: Request) {
-  const jwt = await requireJwt(request);
+  const user = await getUser(request);
 
-  return getUserFromJwt(jwt);
+  if (!user) {
+    const redirectTo = new URL(request.url).pathname;
+    const searchParams = new URLSearchParams([["redirectTo", redirectTo]]);
+    throw redirect(`/login?${searchParams}`);
+  }
+
+  return user;
 }
 
 export async function createUserSession({
   request,
-  jwt,
-  remember,
-  redirectTo,
+  user,
+  remember = true,
+  redirectTo = '/',
 }: {
   request: Request;
-  jwt: string;
+  user: GoogleUser;
   remember: boolean;
   redirectTo: string;
 }) {
   const session = await getSession(request);
-  session.set(USER_SESSION_KEY, jwt);
+  session.set(USER_SESSION_KEY, user);
   return redirect(redirectTo, {
     headers: {
       "Set-Cookie": await sessionStorage.commitSession(session, {
@@ -79,14 +65,33 @@ export async function createUserSession({
   });
 }
 
-export const login = async ({
-  request, jwt, remember = true, redirectTo = '/'
+// export const login = async ({
+//   request, jwt, remember = true, redirectTo = '/'
+// }: {
+//   request: Request; jwt: string;
+//   remember?: boolean; redirectTo?: string;
+// }) => {
+//   const session = await getSession(request);
+//   session.set(USER_SESSION_KEY, jwt);
+//   return redirect(redirectTo, {
+//     headers: {
+//       "Set-Cookie": await sessionStorage.commitSession(session, {
+//         maxAge: remember
+//           ? 60 * 60 * 24 * 7 // 7 days
+//           : undefined,
+//       }),
+//     },
+//   });
+// };
+
+export const googleUserLogin = async ({
+  request, user, remember = true, redirectTo = '/'
 }: {
-  request: Request; jwt: string;
+  request: Request; user: GoogleUser;
   remember?: boolean; redirectTo?: string;
 }) => {
   const session = await getSession(request);
-  session.set(USER_SESSION_KEY, jwt);
+  session.set(USER_SESSION_KEY, user);
   return redirect(redirectTo, {
     headers: {
       "Set-Cookie": await sessionStorage.commitSession(session, {
