@@ -1,33 +1,15 @@
-import { GoogleLogin } from "@react-oauth/google";
-import { type ActionFunction, useSubmit, useSearchParams } from "remix";
-import { login } from "~/session.server";
+import { type LoaderFunction } from "remix";
+import { googleUserLogin } from "~/session.server";
+import { getGoogleAuthUrl, getGoogleUser } from "~/utils/google.user";
 
-export const action: ActionFunction = async ({ request }) => {
-  const formData = await request.formData();
-  const credential = formData.get("credential") as string;
-  const redirectTo = (formData.get("redirectTo") as string) || "/";
+export const loader: LoaderFunction = async ({ request }) => {
+  const url = new URL(request.url);
+  const code = url.searchParams.get("code");
 
-  return login({ request, jwt: credential, redirectTo });
+  if (!code) {
+    return getGoogleAuthUrl();
+  }
+
+  const user = await getGoogleUser(code);
+  return googleUserLogin({ request, user });
 };
-
-export const Login = () => {
-  const submit = useSubmit();
-  const [searchParams] = useSearchParams();
-  const redirectTo = searchParams.get("redirectTo") || "/";
-
-  return (
-    <div className="pt-20">
-      <div className="mx-auto w-[204px]">
-        <GoogleLogin
-          auto_select
-          onSuccess={async (credentialResponse) => {
-            const { credential = "" } = credentialResponse;
-            submit({ redirectTo, credential }, { method: "post" });
-          }}
-        />
-      </div>
-    </div>
-  );
-};
-
-export default Login;

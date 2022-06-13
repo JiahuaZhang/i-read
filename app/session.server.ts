@@ -65,25 +65,6 @@ export async function createUserSession({
   });
 }
 
-// export const login = async ({
-//   request, jwt, remember = true, redirectTo = '/'
-// }: {
-//   request: Request; jwt: string;
-//   remember?: boolean; redirectTo?: string;
-// }) => {
-//   const session = await getSession(request);
-//   session.set(USER_SESSION_KEY, jwt);
-//   return redirect(redirectTo, {
-//     headers: {
-//       "Set-Cookie": await sessionStorage.commitSession(session, {
-//         maxAge: remember
-//           ? 60 * 60 * 24 * 7 // 7 days
-//           : undefined,
-//       }),
-//     },
-//   });
-// };
-
 export const googleUserLogin = async ({
   request, user, remember = true, redirectTo = '/'
 }: {
@@ -96,7 +77,7 @@ export const googleUserLogin = async ({
     headers: {
       "Set-Cookie": await sessionStorage.commitSession(session, {
         maxAge: remember
-          ? 60 * 60 * 24 * 7 // 7 days
+          ? 60 * 60 * 24 * 1
           : undefined,
       }),
     },
