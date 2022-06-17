@@ -22,7 +22,7 @@ export default function () {
     fileList.files?.filter((file) => !isGoogleFolder(file)) || [];
 
   return (
-    <main>
+    <main className="text-lg">
       <section>
         <h1 className="m-2 font-bold">Folder:</h1>
         <div

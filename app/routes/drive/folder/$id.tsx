@@ -28,9 +28,9 @@ export default function () {
   const allFiles = kids.files?.filter((file) => !isGoogleFolder(file)) || [];
 
   return (
-    <main>
+    <main className="text-lg">
       <header>
-        <Breadcrumb>
+        <Breadcrumb className="text-base">
           {parents.map((parent) => (
             <Breadcrumb.Item key={parent.id} className="inline-block">
               <Link to={`/drive/folder/${parent.id}`}>{parent.name}</Link>
