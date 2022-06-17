@@ -1,5 +1,5 @@
 import { type OAuth2Client } from 'google-auth-library';
-import { google, } from 'googleapis';
+import { google } from 'googleapis';
 import jwtDecode, { type JwtPayload } from 'jwt-decode';
 import { redirect } from 'remix';
 import keys from '../../oauth2.keys.json.json';
@@ -48,16 +48,4 @@ export const getGoogleUser = async (code: string) => {
     refresh_token: tokens.refresh_token || '',
     expiration: new Date(tokens.expiry_date!)
   } as GoogleUser;
-};
-
-export const getRootChildren = async () => {
-  const drive = google.drive({ version: 'v2' });
-  const { token } = await global.google.oauth2Client.getAccessToken();
-  return (await drive.children.list({ oauth_token: token!, folderId: 'root' })).data;
-};
-
-export const getFilesByid = async (fileId: string) => {
-  const drive = google.drive({ version: 'v3' });
-  const { token } = await global.google.oauth2Client.getAccessToken();
-  return (await drive.files.get({ oauth_token: token!, fileId })).data;
 };

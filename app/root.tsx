@@ -3,7 +3,6 @@ import type {
   LoaderFunction,
   MetaFunction,
 } from "@remix-run/node";
-import { json } from "@remix-run/node";
 import {
   Links,
   LiveReload,
@@ -11,15 +10,16 @@ import {
   Outlet,
   Scripts,
   ScrollRestoration,
-  useLoaderData,
 } from "@remix-run/react";
 
 import tailwindStylesheetUrl from "./styles/tailwind.css";
-import { getUser } from "./session.server";
-import { GoogleOAuthProvider } from "@react-oauth/google";
+import antdCss from "antd/dist/antd.css";
 
 export const links: LinksFunction = () => {
-  return [{ rel: "stylesheet", href: tailwindStylesheetUrl }];
+  return [
+    { rel: "stylesheet", href: antdCss },
+    { rel: "stylesheet", href: tailwindStylesheetUrl },
+  ];
 };
 
 export const meta: MetaFunction = () => ({
@@ -28,20 +28,11 @@ export const meta: MetaFunction = () => ({
   viewport: "width=device-width,initial-scale=1",
 });
 
-type LoaderData = {
-  user: Awaited<ReturnType<typeof getUser>>;
-};
-
 export const loader: LoaderFunction = async ({ request }) => {
-  return process.env.GOOGLE_CLIENT_ID;
-  // return json<LoaderData>({
-  //   user: await getUser(request),
-  // });
+  return null;
 };
 
 export default function App() {
-  const clientId = useLoaderData();
-
   return (
     <html lang="en" className="h-full">
       <head>
@@ -49,9 +40,7 @@ export default function App() {
         <Links />
       </head>
       <body className="h-full">
-        <GoogleOAuthProvider clientId={clientId}>
-          <Outlet />
-        </GoogleOAuthProvider>
+        <Outlet />
         <ScrollRestoration />
         <Scripts />
         <LiveReload />
