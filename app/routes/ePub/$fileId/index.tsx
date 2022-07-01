@@ -1,21 +1,9 @@
-import type EPub from "epub";
-import { Link } from "remix";
-import { useMatchesData } from "~/utils";
+import { redirect, type LoaderFunction } from "remix";
+import { getEPub } from "~/utils/google.drive.server";
 
-export default function () {
-  const book = useMatchesData<EPub>("routes/ePub/$fileId");
-
-  return (
-    <div>
-      <aside>
-        <ul>
-          {book.flow.map((flow) => (
-            <li key={flow.id}>
-              <Link to={`./${flow.id}`}>{flow.id}</Link>
-            </li>
-          ))}
-        </ul>
-      </aside>
-    </div>
-  );
-}
+export const loader: LoaderFunction = async ({ params }) => {
+  console.log(params);
+  const { fileId } = params;
+  const book = await getEPub(fileId!);
+  return redirect(`/ePub/${fileId}/${book.flow[0].id}`);
+};

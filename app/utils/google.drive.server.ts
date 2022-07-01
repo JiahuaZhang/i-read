@@ -43,7 +43,7 @@ export const getAllParents = async (folder: string) => {
 };
 
 export const getEPub = async (fileId: string) => {
-  if (global.cache.filedId === fileId) {
+  if (global.cache.filedId === fileId && global.cache.epub) {
     return global.cache.epub;
   }
 
