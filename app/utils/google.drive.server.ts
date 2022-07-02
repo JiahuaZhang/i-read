@@ -44,6 +44,7 @@ export const getAllParents = async (folder: string) => {
 
 export const getEPub = async (fileId: string) => {
   if (global.cache.filedId === fileId && global.cache.epub) {
+    console.log('filedId', fileId, 'cached id', global.cache.filedId);
     return global.cache.epub;
   }
 
@@ -54,17 +55,14 @@ export const getEPub = async (fileId: string) => {
   const filepath = path.join(os.tmpdir(), 'current.epub');
   const writeStream = fs.createWriteStream(filepath);
   response.body?.pipe(writeStream);
+  await new Promise(res => writeStream.on('close', res));
 
   const epub = new EPub(filepath);
   epub.parse();
-
-  await new Promise(res => {
-    epub.on('end', res);
-  });
+  await new Promise(res => epub.on('end', res));
 
   global.cache.filedId = fileId;
   global.cache.epub = epub;
-
   return epub;
 };
 
