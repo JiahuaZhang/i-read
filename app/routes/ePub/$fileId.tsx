@@ -42,8 +42,8 @@ export default function () {
         style={{ gridTemplateColumns: "max-content max-content 1fr" }}
       >
         <aside
-          className={`${sidebarState !== SidebarState.Off ? "w-24" : "w-0"} `}
-          style={{ width: width }}
+          className="overflow-y-auto"
+          style={{ width: sidebarState === SidebarState.Off ? 0 : width }}
         >
           todo: aside menu
         </aside>
