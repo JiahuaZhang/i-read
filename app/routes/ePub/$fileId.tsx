@@ -2,8 +2,10 @@ import { MenuOutlined } from "@ant-design/icons";
 import { Menu } from "antd";
 import { useState } from "react";
 import { type LoaderFunction, Outlet } from "remix";
+import TableOfContent from "~/components/ePub/TableOfContent";
 import { getEPub } from "~/utils/google.drive.server";
 import { useResize } from "~/utils/hook/useResize";
+export { ErrorBoundary } from "../index";
 
 export const loader: LoaderFunction = async ({ params }) => {
   const { fileId = "" } = params;
@@ -45,7 +47,7 @@ export default function () {
           className="overflow-y-auto"
           style={{ width: sidebarState === SidebarState.Off ? 0 : width }}
         >
-          todo: aside menu
+          <TableOfContent />
         </aside>
         <div
           className={`${
