@@ -11,7 +11,6 @@ const filterToc = (contents: EPub.TocElement[]) => {
 
 type Content = {
   title: string;
-  href: string;
   id: string;
   children?: Content[];
 };
@@ -19,8 +18,8 @@ type Content = {
 const getNestedContents = (contents: EPub.TocElement[]) => {
   const trackers: Content[] = [];
   const result: Content[] = [];
-  contents.forEach(({ href, title, level, id }) => {
-    const current: Content = { href, title, id, children: [] };
+  contents.forEach(({ title, level, id }) => {
+    const current: Content = { title, id, children: [] };
     if (!trackers[level - 1]) {
       result.push(current);
     } else {
@@ -32,12 +31,12 @@ const getNestedContents = (contents: EPub.TocElement[]) => {
 };
 
 const renderContent = (content: Content, fileId: string) => {
-  const { href, title, id, children } = content;
+  const { title, id, children } = content;
 
   if (children?.length) {
     return (
       <Menu.SubMenu
-        key={href}
+        key={id}
         title={<Link to={`/ePub/${fileId}/${id}`}> {title}</Link>}
       >
         {children.map((child) => renderContent(child, fileId))}
@@ -46,19 +45,34 @@ const renderContent = (content: Content, fileId: string) => {
   }
 
   return (
-    <Menu.Item key={href}>
+    <Menu.Item key={id}>
       <Link to={`/ePub/${fileId}/${id}`}>{title}</Link>
     </Menu.Item>
   );
 };
 
+const getSelectedkeys = (id: string, contents: Content[]): string[] => {
+  for (const content of contents) {
+    if (content.id === id) {
+      return [id];
+    } else if (content.children?.length) {
+      const result = getSelectedkeys(id, content.children);
+      if (result.length) {
+        return [content.id, ...result];
+      }
+    }
+  }
+  return [];
+};
+
 export default function TableOfContent() {
   const book = useLoaderData<EPub>();
   const organizedToc = getNestedContents(filterToc(book.toc));
-  const { fileId } = useParams();
+  const { fileId, id } = useParams();
+  const keys = getSelectedkeys(id!, organizedToc);
 
   return (
-    <Menu mode="inline">
+    <Menu mode="inline" selectedKeys={keys} defaultOpenKeys={keys}>
       {organizedToc.map((content) => renderContent(content, fileId!))}
     </Menu>
   );
