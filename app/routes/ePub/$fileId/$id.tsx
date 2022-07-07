@@ -1,6 +1,12 @@
 import type EPub from "epub";
-import { useMemo } from "react";
-import { Link, useLoaderData, useParams, type LoaderFunction } from "remix";
+import { useEffect, useMemo } from "react";
+import {
+  Link,
+  useLoaderData,
+  useNavigate,
+  useParams,
+  type LoaderFunction,
+} from "remix";
 import { useMatchesData } from "~/utils";
 import { getCurrentEpubChapter } from "~/utils/google.drive.server";
 
@@ -44,6 +50,23 @@ export default function () {
     () => getAdjacentFlow(id!, book.flow),
     [id, book.flow]
   );
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const keyNavigate = (event: KeyboardEvent) => {
+      console.log("key navigate");
+
+      if (event.key === "ArrowLeft" && siblings[0]) {
+        navigate(`/ePub/${fileId}/${siblings[0]}`);
+      } else if (event.key === "ArrowRight" && siblings[1]) {
+        navigate(`/ePub/${fileId}/${siblings[1]}`);
+      }
+    };
+
+    document.addEventListener("keyup", keyNavigate);
+
+    return () => document.removeEventListener("keyup", keyNavigate);
+  }, [siblings, navigate, fileId]);
 
   return (
     <main>
