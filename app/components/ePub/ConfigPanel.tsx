@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useRecoilState } from "recoil";
+import { bookConfigState } from "~/utils/state/book.config";
 
 export const ConfigPanel = () => {
-  const [fontSize, setFontSize] = useState(16);
+  const [{ fontSize }, setConfig] = useRecoilState(bookConfigState);
 
   return (
     <div>
@@ -12,7 +13,11 @@ export const ConfigPanel = () => {
         <div
           className="cursor-pointer select-none"
           style={{ fontSize: fontSize > 8 ? fontSize - 2 : 8 }}
-          onClick={() => setFontSize((size) => size - 2)}
+          onClick={() => {
+            if (fontSize > 8) {
+              setConfig((prev) => ({ ...prev, fontSize: fontSize - 2 }));
+            }
+          }}
         >
           a
         </div>
@@ -23,7 +28,11 @@ export const ConfigPanel = () => {
         <div
           className="cursor-pointer select-none"
           style={{ fontSize: fontSize < 72 ? fontSize + 2 : 72 }}
-          onClick={() => setFontSize((size) => size + 2)}
+          onClick={() => {
+            if (fontSize < 72) {
+              setConfig((prev) => ({ ...prev, fontSize: fontSize + 2 }));
+            }
+          }}
         >
           A
         </div>

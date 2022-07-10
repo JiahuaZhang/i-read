@@ -11,6 +11,7 @@ import {
   Scripts,
   ScrollRestoration,
 } from "@remix-run/react";
+import { RecoilRoot } from "recoil";
 
 import tailwindStylesheetUrl from "./styles/tailwind.css";
 import antdCss from "antd/dist/antd.css";
@@ -40,7 +41,9 @@ export default function App() {
         <Links />
       </head>
       <body className="h-full">
-        <Outlet />
+        <RecoilRoot>
+          <Outlet />
+        </RecoilRoot>
         <ScrollRestoration />
         <Scripts />
         <LiveReload />
