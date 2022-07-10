@@ -1,7 +1,8 @@
-import { MenuOutlined } from "@ant-design/icons";
+import { MenuOutlined, SettingOutlined } from "@ant-design/icons";
 import { Menu } from "antd";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { type LoaderFunction, Outlet } from "remix";
+import { ConfigPanel } from "~/components/ePub/ConfigPanel";
 import TableOfContent from "~/components/ePub/TableOfContent";
 import { getEPub } from "~/utils/google.drive.server";
 import { useResize } from "~/utils/hook/useResize";
@@ -15,11 +16,18 @@ export const loader: LoaderFunction = async ({ params }) => {
 enum SidebarState {
   Off = "Off",
   Menu = "Menu",
+  Config = "Config",
 }
 
 export default function () {
-  const [sidebarState, setSidebarState] = useState(SidebarState.Off);
+  const [sidebarState, setSidebarState] = useState(SidebarState.Config);
   const { width, mount, unmount } = useResize();
+
+  const toggleMenu = useCallback(
+    (state: SidebarState) =>
+      setSidebarState((prev) => (prev === state ? SidebarState.Off : state)),
+    [setSidebarState]
+  );
 
   return (
     <div className="grid h-screen">
@@ -30,13 +38,15 @@ export default function () {
       >
         <Menu.Item
           key={SidebarState.Menu}
-          onClick={() =>
-            setSidebarState((prev) =>
-              prev === SidebarState.Off ? SidebarState.Menu : SidebarState.Off
-            )
-          }
+          onClick={() => toggleMenu(SidebarState.Menu)}
         >
           <MenuOutlined />
+        </Menu.Item>
+        <Menu.Item
+          key={SidebarState.Config}
+          onClick={() => toggleMenu(SidebarState.Config)}
+        >
+          <SettingOutlined />
         </Menu.Item>
       </Menu>
       <section
@@ -47,7 +57,8 @@ export default function () {
           className="overflow-y-auto"
           style={{ width: sidebarState === SidebarState.Off ? 0 : width }}
         >
-          <TableOfContent />
+          {sidebarState === SidebarState.Menu && <TableOfContent />}
+          {sidebarState === SidebarState.Config && <ConfigPanel />}
         </aside>
         <div
           className={`${
