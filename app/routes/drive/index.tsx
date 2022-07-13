@@ -1,5 +1,6 @@
 import { type drive_v3 } from "googleapis";
-import { useLoaderData, type LoaderFunction } from "remix";
+import { type LoaderFunction } from "@remix-run/node";
+import { useLoaderData } from "@remix-run/react";
 import { FileLink } from "~/components/FileLink";
 import { FolderLink } from "~/components/FolderLink";
 import { requireUser } from "~/session.server";

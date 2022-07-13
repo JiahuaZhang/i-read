@@ -1,4 +1,4 @@
-import { type LoaderFunction } from "remix";
+import { type LoaderFunction } from "@remix-run/node";
 import { googleUserLogin } from "~/session.server";
 import { getGoogleAuthUrl, getGoogleUser } from "~/utils/google.user";
 

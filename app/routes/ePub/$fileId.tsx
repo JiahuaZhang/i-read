@@ -1,7 +1,8 @@
 import { MenuOutlined, SettingOutlined } from "@ant-design/icons";
 import { Menu } from "antd";
 import { useCallback, useState } from "react";
-import { type LoaderFunction, Outlet } from "remix";
+import { type LoaderFunction } from "@remix-run/node";
+import { Outlet } from "@remix-run/react";
 import { ConfigPanel } from "~/components/ePub/ConfigPanel/ConfigPanel";
 import TableOfContent from "~/components/ePub/TableOfContent";
 import { getEPub } from "~/utils/google.drive.server";

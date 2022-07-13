@@ -1,6 +1,6 @@
 import type EPub from "epub";
 import { useEffect, useMemo } from "react";
-import { Link, useNavigate, useParams } from "remix";
+import { Link, useNavigate, useParams } from "@remix-run/react";
 import { useMatchesData } from "~/utils";
 
 const getAdjacentFlow = (id: string, flows: EPub.TocElement[]) => {

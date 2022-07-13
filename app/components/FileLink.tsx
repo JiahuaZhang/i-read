@@ -1,5 +1,5 @@
 import { type drive_v3 } from "googleapis";
-import { Link } from "remix";
+import { Link } from "@remix-run/react";
 
 const GOOGLE_EPUB_TYPE = "application/epub+zip";
 export const isEpub = (file: drive_v3.Schema$File) =>

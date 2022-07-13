@@ -1,7 +1,7 @@
 import { type OAuth2Client } from 'google-auth-library';
 import { google } from 'googleapis';
 import jwtDecode, { type JwtPayload } from 'jwt-decode';
-import { redirect } from 'remix';
+import { redirect } from "@remix-run/node";
 import keys from '../../oauth2.keys.json.json';
 
 export type GoogleUser = {

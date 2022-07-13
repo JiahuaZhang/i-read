@@ -1,6 +1,7 @@
 import { Breadcrumb } from "antd";
 import { type drive_v3 } from "googleapis";
-import { Link, redirect, useLoaderData, type LoaderFunction } from "remix";
+import { type LoaderFunction, redirect } from "@remix-run/node";
+import { Link, useLoaderData } from "@remix-run/react";
 import { FileLink } from "~/components/FileLink";
 import { FolderLink } from "~/components/FolderLink";
 import { getAllParents, getFolderFiles } from "~/utils/google.drive.server";

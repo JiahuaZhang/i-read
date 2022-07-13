@@ -1,6 +1,6 @@
 import { Menu } from "antd";
 import type EPub from "epub";
-import { Link, useLoaderData, useParams } from "remix";
+import { Link, useLoaderData, useParams } from "@remix-run/react";
 
 const filterToc = (contents: EPub.TocElement[]) => {
   const uniq: { [key: string]: boolean } = {};

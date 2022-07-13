@@ -1,6 +1,6 @@
 import { FolderFilled } from "@ant-design/icons";
 import { type drive_v3 } from "googleapis";
-import { Link } from "remix";
+import { Link } from "@remix-run/react";
 
 type Props = {
   file: drive_v3.Schema$File;

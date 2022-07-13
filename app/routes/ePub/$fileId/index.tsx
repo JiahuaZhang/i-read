@@ -1,4 +1,4 @@
-import { redirect, type LoaderFunction } from "remix";
+import { type LoaderFunction, redirect } from "@remix-run/node";
 import { getEPub } from "~/utils/google.drive.server";
 
 export const loader: LoaderFunction = async ({ params }) => {
