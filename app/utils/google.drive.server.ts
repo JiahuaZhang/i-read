@@ -53,9 +53,8 @@ export const getEPub = async (fileId: string) => {
     { headers: new Headers({ Authorization: headers.Authorization }) });
 
   const filepath = path.join(os.tmpdir(), 'current.epub');
-  const writeStream = fs.createWriteStream(filepath);
-  response.body?.pipe(writeStream);
-  await new Promise(res => writeStream.on('close', res));
+  const data = Buffer.from(await response.arrayBuffer());
+  await fs.promises.writeFile(filepath, data);
 
   const epub = new EPub(filepath);
   epub.parse();
