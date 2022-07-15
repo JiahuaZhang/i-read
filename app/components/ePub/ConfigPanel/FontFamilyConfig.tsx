@@ -39,7 +39,9 @@ export const FontFamilyConfig = () => {
                     setConfig((prev) => ({
                       ...prev,
                       englishFontFamily: font,
-                      fontFamily: `${font}, ${prev.chinseFontFamily}`,
+                      fontFamily: [font, prev.chinseFontFamily]
+                        .filter(Boolean)
+                        .join(","),
                     }));
                   }
                 }}
@@ -79,7 +81,9 @@ export const FontFamilyConfig = () => {
                     setConfig((prev) => ({
                       ...prev,
                       chinseFontFamily: font[1],
-                      fontFamily: `${font[1]}, ${prev.englishFontFamily}`,
+                      fontFamily: [font[1], prev.englishFontFamily]
+                        .filter(Boolean)
+                        .join(","),
                     }));
                   }
                 }}
