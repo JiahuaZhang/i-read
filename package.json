@@ -36,7 +36,7 @@
   ],
   "dependencies": {
     "@ant-design/icons": "^4.7.0",
-    "@prisma/client": "^3.11.1",
+    "@prisma/client": "^4.1.0",
     "@react-oauth/google": "^0.2.0",
     "@recoiljs/refine": "^0.1.0",
     "@remix-run/express": "^1.6.4",
@@ -45,6 +45,7 @@
     "@remix-run/serve": "^1.6.4",
     "antd": "^4.20.5",
     "cross-env": "^7.0.3",
+    "dexie": "^3.2.2",
     "epub": "^1.2.1",
     "express": "^4.17.3",
     "googleapis": "^100.0.0",
