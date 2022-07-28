@@ -11,8 +11,10 @@ const default_chinese_fonts = [
 ];
 
 export const FontFamilyConfig = () => {
-  const [{ chinseFontFamily, englishFontFamily }, setConfig] =
-    useRecoilState(bookConfigState);
+  const [
+    { config: { chinseFontFamily, englishFontFamily }, },
+    setConfig,
+  ] = useRecoilState(bookConfigState);
 
   return (
     <Tabs centered>
@@ -32,16 +34,22 @@ export const FontFamilyConfig = () => {
                   if (font === englishFontFamily) {
                     setConfig((prev) => ({
                       ...prev,
-                      englishFontFamily: "",
-                      fontFamily: prev.chinseFontFamily,
+                      config: {
+                        ...prev.config,
+                        englishFontFamily: "",
+                        fontFamily: prev.config.chinseFontFamily,
+                      },
                     }));
                   } else {
                     setConfig((prev) => ({
                       ...prev,
-                      englishFontFamily: font,
-                      fontFamily: [font, prev.chinseFontFamily]
-                        .filter(Boolean)
-                        .join(","),
+                      config: {
+                        ...prev.config,
+                        englishFontFamily: font,
+                        fontFamily: [font, prev.config.chinseFontFamily]
+                          .filter(Boolean)
+                          .join(","),
+                      },
                     }));
                   }
                 }}
@@ -74,16 +82,22 @@ export const FontFamilyConfig = () => {
                   if (font[1] === chinseFontFamily) {
                     setConfig((prev) => ({
                       ...prev,
-                      chinseFontFamily: "",
-                      fontFamily: prev.englishFontFamily,
+                      config: {
+                        ...prev.config,
+                        chinseFontFamily: "",
+                        fontFamily: prev.config.englishFontFamily,
+                      },
                     }));
                   } else {
                     setConfig((prev) => ({
                       ...prev,
-                      chinseFontFamily: font[1],
-                      fontFamily: [font[1], prev.englishFontFamily]
-                        .filter(Boolean)
-                        .join(","),
+                      config: {
+                        ...prev.config,
+                        chinseFontFamily: font[1],
+                        fontFamily: [font[1], prev.config.englishFontFamily]
+                          .filter(Boolean)
+                          .join(","),
+                      },
                     }));
                   }
                 }}

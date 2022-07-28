@@ -27,7 +27,7 @@ export const loader: LoaderFunction = async ({ params }) => {
 
 export default function () {
   const html = useLoaderData();
-  const { fontSize, fontFamily } = useRecoilValue(bookConfigState);
+  const { config: { fontFamily, fontSize }, } = useRecoilValue(bookConfigState);
 
   return (
     <main>

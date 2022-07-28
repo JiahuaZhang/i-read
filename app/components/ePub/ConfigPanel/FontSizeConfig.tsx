@@ -2,7 +2,10 @@ import { useRecoilState } from "recoil";
 import { bookConfigState } from "~/utils/state/book.config";
 
 export const FontSizeConfig = () => {
-  const [{ fontSize }, setConfig] = useRecoilState(bookConfigState);
+  const [
+    { config: { fontSize }, },
+    setConfig,
+  ] = useRecoilState(bookConfigState);
 
   return (
     <div
@@ -14,7 +17,10 @@ export const FontSizeConfig = () => {
         style={{ fontSize: fontSize > 8 ? fontSize - 2 : 8 }}
         onClick={() => {
           if (fontSize > 8) {
-            setConfig((prev) => ({ ...prev, fontSize: fontSize - 2 }));
+            setConfig((prev) => ({
+              ...prev,
+              config: { ...prev.config, fontSize: fontSize - 2 },
+            }));
           }
         }}
       >
@@ -29,7 +35,10 @@ export const FontSizeConfig = () => {
         style={{ fontSize: fontSize < 72 ? fontSize + 2 : 72 }}
         onClick={() => {
           if (fontSize < 72) {
-            setConfig((prev) => ({ ...prev, fontSize: fontSize + 2 }));
+            setConfig((prev) => ({
+              ...prev,
+              config: { ...prev.config, fontSize: fontSize + 2 },
+            }));
           }
         }}
       >

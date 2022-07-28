@@ -3,15 +3,17 @@ import { atom } from 'recoil';
 import { syncEffect } from 'recoil-sync';
 
 export type BookConfig = {
-  fontSize: number;
-  chinseFontFamily: string;
-  englishFontFamily: string;
-  fontFamily: string;
+  config: {
+    fontSize: number;
+    chinseFontFamily: string;
+    englishFontFamily: string;
+    fontFamily: string;
+  };
   fileId: string;
   // currentPage: string;
 };
 
-export const defaultBookConfig: BookConfig = { fontSize: 28, chinseFontFamily: '', englishFontFamily: '', fontFamily: '', fileId: '' };
+export const defaultBookConfig: BookConfig = { config: { fontSize: 28, chinseFontFamily: '', englishFontFamily: '', fontFamily: '', }, fileId: '' };
 
 export const storeKey = "recoil-sync-indexedDB";
 
@@ -22,12 +24,15 @@ export const bookConfigState = atom({
     syncEffect({
       storeKey: storeKey,
       refine: object({
-        fontSize: number(),
-        chinseFontFamily: string(),
-        englishFontFamily: string(),
-        fontFamily: string(),
+        config: object({
+          fontSize: number(),
+          chinseFontFamily: string(),
+          englishFontFamily: string(),
+          fontFamily: string()
+        }),
         fileId: string(),
       })
+
     }),
   ],
 });
