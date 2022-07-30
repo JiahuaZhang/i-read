@@ -1,13 +1,13 @@
 import { MenuOutlined, SettingOutlined } from "@ant-design/icons";
-import { Menu } from "antd";
-import { useCallback, useState } from "react";
 import { type LoaderFunction } from "@remix-run/node";
 import { Outlet } from "@remix-run/react";
+import { Menu } from "antd";
+import { useCallback, useState } from "react";
 import { ConfigPanel } from "~/components/ePub/ConfigPanel/ConfigPanel";
 import TableOfContent from "~/components/ePub/TableOfContent";
+import { RecoilSyncIndexedDB } from "~/components/recoil/RecoilSyncIndexedDB";
 import { getEPub } from "~/utils/google.drive.server";
 import { useResize } from "~/utils/hook/useResize";
-import { RecoilSyncIndexedDB } from "~/components/recoil/RecoilSyncIndexedDB";
 export { ErrorBoundary } from "../index";
 
 export const loader: LoaderFunction = async ({ params }) => {
