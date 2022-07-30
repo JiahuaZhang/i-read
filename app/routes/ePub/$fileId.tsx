@@ -18,7 +18,7 @@ export const loader: LoaderFunction = async ({ params }) => {
 enum SidebarState {
   Off = "Off",
   Menu = "Menu",
-  Config = "Config",
+  Config = "Config"
 }
 
 export default function () {
@@ -31,6 +31,15 @@ export default function () {
     [setSidebarState]
   );
 
+  const menuItems = [
+    { label: <MenuOutlined onClick={() => toggleMenu(SidebarState.Menu)} />,
+      key: SidebarState.Menu },
+    { label: (
+        <SettingOutlined onClick={() => toggleMenu(SidebarState.Config)} />
+      ),
+      key: SidebarState.Config }
+  ];
+
   return (
     <RecoilSyncIndexedDB>
       <div className="grid h-screen">
@@ -38,20 +47,8 @@ export default function () {
           mode="horizontal"
           selectedKeys={[sidebarState]}
           className="flex h-12"
-        >
-          <Menu.Item
-            key={SidebarState.Menu}
-            onClick={() => toggleMenu(SidebarState.Menu)}
-          >
-            <MenuOutlined />
-          </Menu.Item>
-          <Menu.Item
-            key={SidebarState.Config}
-            onClick={() => toggleMenu(SidebarState.Config)}
-          >
-            <SettingOutlined />
-          </Menu.Item>
-        </Menu>
+          items={menuItems}
+        />
         <section
           className="grid h-[calc(100vh-3rem)]"
           style={{ gridTemplateColumns: "max-content max-content 1fr" }}

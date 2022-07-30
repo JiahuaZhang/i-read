@@ -27,7 +27,7 @@ export const ConfigPanel = () => {
       <FontSizeConfig />
       <FontFamilyConfig />
 
-      <div className="grid grid-flow-col place-items-center" ref={divRef}>
+      <div className="mt-2 grid grid-flow-col place-items-center" ref={divRef}>
         <Button
           className="rounded bg-blue-600 text-white"
           onClick={() => {
