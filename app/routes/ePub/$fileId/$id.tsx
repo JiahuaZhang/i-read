@@ -16,7 +16,7 @@ export const links: LinksFunction = () => {
     { rel: "stylesheet", href: fangZhengFont },
     { rel: "stylesheet", href: georgiaFont },
     { rel: "stylesheet", href: helveticaFont },
-    { rel: "stylesheet", href: tahomaFont },
+    { rel: "stylesheet", href: tahomaFont }
   ];
 };
 
@@ -27,7 +27,7 @@ export const loader: LoaderFunction = async ({ params }) => {
 
 export default function () {
   const html = useLoaderData();
-  const { config: { fontFamily, fontSize }, } = useRecoilValue(bookConfigState);
+  const { config: { fontFamily, fontSize } } = useRecoilValue(bookConfigState);
 
   return (
     <main>
