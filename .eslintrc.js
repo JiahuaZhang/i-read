@@ -21,7 +21,6 @@ module.exports = {
   // set the jest version explicitly.
   settings: { jest: { version: 27 } },
   rules: {
-    "no-unused-vars": "off",
     "@typescript-eslint/no-unused-vars": [
       "warn",
       {
@@ -30,6 +29,8 @@ module.exports = {
         caughtErrorsIgnorePattern: "^_"
       }
     ],
+    "@typescript-eslint/no-non-null-assertion": "off",
+    "no-unused-vars": "off",
     "object-curly-newline": [
       "warn",
       {
