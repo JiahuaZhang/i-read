@@ -1,24 +1,14 @@
 import { type LinksFunction, type LoaderFunction } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
-import arialFont from "public/font/Arial/font.css";
-import fangZhengFont from "public/font/FangZheng/font.css";
-import georgiaFont from "public/font/Georgia/font.css";
-import helveticaFont from "public/font/Helvetica/font.css";
-import tahomaFont from "public/font/Tahoma/font.css";
 import { useRecoilValue } from "recoil";
 import { PageNavigationBar } from "~/components/ePub/PageNavigationBar";
+import fontCss from "~/styles/font.css";
 import { getCurrentEpubChapter } from "~/utils/google.drive.server";
 import { bookConfigState } from "~/utils/state/book.config";
 
-export const links: LinksFunction = () => {
-  return [
-    { rel: "stylesheet", href: arialFont },
-    { rel: "stylesheet", href: fangZhengFont },
-    { rel: "stylesheet", href: georgiaFont },
-    { rel: "stylesheet", href: helveticaFont },
-    { rel: "stylesheet", href: tahomaFont }
-  ];
-};
+export const links: LinksFunction = () => [
+  { rel: "stylesheet", href: fontCss }
+];
 
 export const loader: LoaderFunction = async ({ params }) => {
   const { id } = params;
@@ -27,14 +17,15 @@ export const loader: LoaderFunction = async ({ params }) => {
 
 export default function () {
   const html = useLoaderData();
-  const { config: { fontFamily, fontSize } } = useRecoilValue(bookConfigState);
+  const { config: { fontSize, chinseFontFamily, englishFontFamily } } = useRecoilValue(bookConfigState);
 
   return (
     <main>
       <PageNavigationBar />
       <div
+        className={`${chinseFontFamily} ${englishFontFamily}`}
+        style={{ fontSize }}
         dangerouslySetInnerHTML={{ __html: html }}
-        style={{ fontSize, fontFamily }}
       />
     </main>
   );

@@ -7,12 +7,12 @@ module.exports = {
     // "@remix-run/eslint-config/node",
     // "@remix-run/eslint-config/jest-testing-library",
     "eslint:recommended",
-    "plugin:@typescript-eslint/recommended"
+    "plugin:@typescript-eslint/recommended",
   ],
   parser: "@typescript-eslint/parser",
   parserOptions: {
     project: "./tsconfig.json",
-    tsconfigRootDir: __dirname
+    tsconfigRootDir: __dirname,
   },
   plugins: ["@typescript-eslint"],
   ignorePatterns: [".eslintrc.js"],
@@ -26,21 +26,21 @@ module.exports = {
       {
         argsIgnorePattern: "^_",
         varsIgnorePattern: "^_",
-        caughtErrorsIgnorePattern: "^_"
-      }
+        caughtErrorsIgnorePattern: "^_",
+      },
     ],
     "@typescript-eslint/no-non-null-assertion": "off",
     "no-unused-vars": "off",
-    "object-curly-newline": [
-      "warn",
-      {
-        ObjectExpression: { multiline: false, minProperties: 3 },
-        ObjectPattern: { multiline: false },
-        ImportDeclaration: "never",
-        ExportDeclaration: { multiline: false, minProperties: 3 }
-      }
-    ],
-    "comma-dangle": ["warn", "never"],
-    "object-curly-spacing": ["warn", "always"]
-  }
+    // "object-curly-newline": [
+    //   "warn",
+    //   {
+    //     ObjectExpression: { multiline: false, minProperties: 3 },
+    //     ObjectPattern: { multiline: false, minProperties: 3 },
+    //     ImportDeclaration: "never",
+    //     ExportDeclaration: { multiline: false, minProperties: 3 },
+    //   },
+    // ],
+    // "comma-dangle": ["warn", "never"],
+    "object-curly-spacing": ["warn", "always"],
+  },
 };

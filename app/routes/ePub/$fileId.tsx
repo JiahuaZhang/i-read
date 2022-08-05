@@ -22,7 +22,7 @@ enum SidebarState {
 }
 
 export default function () {
-  const [sidebarState, setSidebarState] = useState(SidebarState.Config);
+  const [sidebarState, setSidebarState] = useState(SidebarState.Off);
   const { width, mount, unmount } = useResize();
 
   const toggleMenu = useCallback(
@@ -32,12 +32,16 @@ export default function () {
   );
 
   const menuItems = [
-    { label: <MenuOutlined onClick={() => toggleMenu(SidebarState.Menu)} />,
-      key: SidebarState.Menu },
-    { label: (
+    {
+      label: <MenuOutlined onClick={() => toggleMenu(SidebarState.Menu)} />,
+      key: SidebarState.Menu
+    },
+    {
+      label: (
         <SettingOutlined onClick={() => toggleMenu(SidebarState.Config)} />
       ),
-      key: SidebarState.Config }
+      key: SidebarState.Config
+    }
   ];
 
   return (
@@ -61,9 +65,8 @@ export default function () {
             {sidebarState === SidebarState.Config && <ConfigPanel />}
           </aside>
           <div
-            className={`${
-              sidebarState === SidebarState.Off ? "w-0" : "w-[6px]"
-            } cursor-ew-resize bg-gray-200`}
+            className={`${sidebarState === SidebarState.Off ? "w-0" : "w-[6px]"
+              } cursor-ew-resize bg-gray-200`}
             onMouseDown={mount}
             onMouseUp={unmount}
           />

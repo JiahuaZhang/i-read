@@ -2,18 +2,25 @@ import { Radio, Space, Tabs } from "antd";
 import { useRecoilState } from "recoil";
 import { bookConfigState } from "~/utils/state/book.config";
 
-const default_english_fonts = ["Arial", "Georgia", "Helvetica", "Tahoma"];
-const default_chinese_fonts = [
-  ["方正黑体", "HeiTi"],
-  ["方正书宋", "ShuSong"],
-  ["方正仿宋", "FangSong"],
-  ["方正楷体", "KaiTi"],
+const all_english_fonts = [
+  "font-Arial",
+  "font-Georgia",
+  "font-Helvetica",
+  "font-Tahoma"
+];
+const all_chinese_fonts = [
+  "font-方正黑体",
+  "font-方正书宋",
+  "font-方正仿宋",
+  "font-方正楷体",
+  "font-思源黑体",
+  "font-思源宋体"
 ];
 
 export const FontFamilyConfig = () => {
   const [
-    {config: { chinseFontFamily, englishFontFamily },},
-    setConfig,
+    { config: { chinseFontFamily, englishFontFamily } },
+    setConfig
   ] = useRecoilState(bookConfigState);
 
   return (
@@ -24,41 +31,39 @@ export const FontFamilyConfig = () => {
           className="grid w-full place-items-center"
         >
           <Space direction="vertical">
-            {default_english_fonts.map((font) => (
+            {all_english_fonts.map((font) => (
               <Radio.Button
                 key={font}
                 value={font}
-                className="w-full text-center"
-                style={{ fontFamily: font }}
+                className={`w-full text-center ${font}`}
                 onClick={() => {
                   if (font === englishFontFamily) {
-                    setConfig((prev) => ({...prev,
+                    setConfig((prev) => ({
+                      ...prev,
                       config: {
                         ...prev.config,
                         englishFontFamily: "",
-                        fontFamily: prev.config.chinseFontFamily,
-                      },}));
+                        fontFamily: prev.config.chinseFontFamily
+                      }
+                    }));
                   } else {
-                    setConfig((prev) => ({...prev,
+                    setConfig((prev) => ({
+                      ...prev,
                       config: {
                         ...prev.config,
                         englishFontFamily: font,
-                        fontFamily: [font, prev.config.chinseFontFamily]
-                          .filter(Boolean)
-                          .join(","),
-                      },}));
+                        fontFamily: `${font} ${prev.config.chinseFontFamily}`
+                      }
+                    }));
                   }
                 }}
               >
-                {font}
+                {font.split("-")[1]}
               </Radio.Button>
             ))}
           </Space>
         </Radio.Group>
-        <p
-          style={{ fontFamily: englishFontFamily }}
-          className="px-2 indent-0 text-xl"
-        >
+        <p className={`px-2 indent-0 text-xl ${englishFontFamily}`}>
           The quick brown fox jumped over the lazy dog
         </p>
       </Tabs.TabPane>
@@ -68,41 +73,39 @@ export const FontFamilyConfig = () => {
           value={chinseFontFamily}
         >
           <Space direction="vertical">
-            {default_chinese_fonts.map((font) => (
+            {all_chinese_fonts.map((font) => (
               <Radio.Button
-                className="w-full text-center"
-                key={font[1]}
-                value={font[1]}
-                style={{ fontFamily: font[1] }}
+                className={`w-full text-center ${font}`}
+                key={font}
+                value={font}
                 onClick={() => {
-                  if (font[1] === chinseFontFamily) {
-                    setConfig((prev) => ({...prev,
+                  if (font === chinseFontFamily) {
+                    setConfig((prev) => ({
+                      ...prev,
                       config: {
                         ...prev.config,
                         chinseFontFamily: "",
-                        fontFamily: prev.config.englishFontFamily,
-                      },}));
+                        fontFamily: prev.config.englishFontFamily
+                      }
+                    }));
                   } else {
-                    setConfig((prev) => ({...prev,
+                    setConfig((prev) => ({
+                      ...prev,
                       config: {
                         ...prev.config,
-                        chinseFontFamily: font[1],
-                        fontFamily: [font[1], prev.config.englishFontFamily]
-                          .filter(Boolean)
-                          .join(","),
-                      },}));
+                        chinseFontFamily: font,
+                        fontFamily: `${font} ${prev.config.englishFontFamily}`
+                      }
+                    }));
                   }
                 }}
               >
-                {font[0]}
+                {font.split("-")[1]}
               </Radio.Button>
             ))}
           </Space>
         </Radio.Group>
-        <p
-          style={{ fontFamily: chinseFontFamily }}
-          className="text-center indent-0 text-2xl"
-        >
+        <p className={`text-center indent-0 text-2xl ${chinseFontFamily}`}>
           天地玄黄，宇宙洪荒。
           <br />
           日月盈昃，辰宿列张。

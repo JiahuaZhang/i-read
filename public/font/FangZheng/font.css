@@ -4,17 +4,7 @@
 }
 
 @font-face {
-  font-family: "HeiTi";
-  src: url("./FangZhengHeiTi-GBK.ttf") format("truetype");
-}
-
-@font-face {
   font-family: "方正书宋";
-  src: url("./FangZhengShuSong-GBK.ttf") format("truetype");
-}
-
-@font-face {
-  font-family: "ShuSong";
   src: url("./FangZhengShuSong-GBK.ttf") format("truetype");
 }
 
@@ -24,16 +14,6 @@
 }
 
 @font-face {
-  font-family: "FangSong";
-  src: url("./FangZhengFangSong-GBK-1.ttf") format("truetype");
-}
-
-@font-face {
   font-family: "方正楷体";
-  src: url("./FangZhengKaiTi-GBK.ttf") format("truetype");
-}
-
-@font-face {
-  font-family: "KaiTi";
   src: url("./FangZhengKaiTi-GBK.ttf") format("truetype");
 }
