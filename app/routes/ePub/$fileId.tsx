@@ -1,10 +1,11 @@
-import { MenuOutlined, SettingOutlined } from "@ant-design/icons";
+import { MenuOutlined, ProfileOutlined, SettingOutlined } from "@ant-design/icons";
 import { type LoaderFunction } from "@remix-run/node";
 import { Outlet } from "@remix-run/react";
 import { Menu } from "antd";
 import { useCallback, useState } from "react";
-import { ConfigPanel } from "~/components/ePub/ConfigPanel/ConfigPanel";
-import TableOfContent from "~/components/ePub/TableOfContent";
+import { ConfigPanel } from "~/components/ePub/configPanel/ConfigPanel";
+import { Note } from '~/components/ePub/sideBar/Note';
+import TableOfContent from "~/components/ePub/sideBar/TableOfContent";
 import { RecoilSyncIndexedDB } from "~/components/recoil/RecoilSyncIndexedDB";
 import { getEPub } from "~/utils/google.drive.server";
 import { useResize } from "~/utils/hook/useResize";
@@ -18,7 +19,8 @@ export const loader: LoaderFunction = async ({ params }) => {
 enum SidebarState {
   Off = "Off",
   Menu = "Menu",
-  Config = "Config"
+  Config = "Config",
+  Note = "Note"
 }
 
 export default function () {
@@ -41,6 +43,10 @@ export default function () {
         <SettingOutlined onClick={() => toggleMenu(SidebarState.Config)} />
       ),
       key: SidebarState.Config
+    },
+    {
+      label: <ProfileOutlined onClick={() => toggleMenu(SidebarState.Note)} />,
+      key: SidebarState.Note
     }
   ];
 
@@ -63,6 +69,7 @@ export default function () {
           >
             {sidebarState === SidebarState.Menu && <TableOfContent />}
             {sidebarState === SidebarState.Config && <ConfigPanel />}
+            {sidebarState === SidebarState.Note && <Note />}
           </aside>
           <div
             className={`${sidebarState === SidebarState.Off ? "w-0" : "w-[6px]"

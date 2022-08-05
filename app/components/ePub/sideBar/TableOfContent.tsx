@@ -4,7 +4,7 @@ import { ItemType } from "antd/lib/menu/hooks/useItems";
 import type EPub from "epub";
 
 const filterToc = (contents: EPub.TocElement[]) => {
-  const uniq: { [key: string]: boolean } = {};
+  const uniq: { [key: string]: boolean; } = {};
   return contents.filter(
     (content) => !uniq[content.id] && (uniq[content.id] = true)
   );
