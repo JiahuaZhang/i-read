@@ -3,7 +3,7 @@ import { type LoaderFunction } from "@remix-run/node";
 import { Outlet } from "@remix-run/react";
 import { Menu } from "antd";
 import { useCallback, useState } from "react";
-import { ConfigPanel } from "~/components/ePub/configPanel/ConfigPanel";
+import { ConfigPanel } from "~/components/ePub/sideBar/configPanel/ConfigPanel";
 import { Note } from '~/components/ePub/sideBar/Note';
 import TableOfContent from "~/components/ePub/sideBar/TableOfContent";
 import { RecoilSyncIndexedDB } from "~/components/recoil/RecoilSyncIndexedDB";
