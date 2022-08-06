@@ -20,7 +20,7 @@ export default function () {
   const { config: { fontSize, chinseFontFamily, englishFontFamily } } = useRecoilValue(bookConfigState);
 
   return (
-    <main>
+    <main className='h-full min-h-0 overflow-y-auto'>
       <PageNavigationBar />
       <div
         className={`${chinseFontFamily} ${englishFontFamily}`}

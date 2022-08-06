@@ -24,7 +24,7 @@ enum SidebarState {
 }
 
 export default function () {
-  const [sidebarState, setSidebarState] = useState(SidebarState.Off);
+  const [sidebarState, setSidebarState] = useState(SidebarState.Menu);
   const { width, mount, unmount } = useResize();
 
   const toggleMenu = useCallback(
@@ -56,11 +56,11 @@ export default function () {
         <Menu
           mode="horizontal"
           selectedKeys={[sidebarState]}
-          className="flex h-12"
           items={menuItems}
+          className='[&>li]:leading-10'
         />
         <section
-          className="grid h-[calc(100vh-3rem)]"
+          className="inline-grid min-h-0 h-full"
           style={{ gridTemplateColumns: "max-content max-content 1fr" }}
         >
           <aside
@@ -72,12 +72,11 @@ export default function () {
             {sidebarState === SidebarState.Note && <Note />}
           </aside>
           <div
-            className={`${sidebarState === SidebarState.Off ? "w-0" : "w-[6px]"
-              } cursor-ew-resize bg-gray-200`}
+            className={`${sidebarState === SidebarState.Off ? "w-0" : "w-[6px]"} cursor-ew-resize bg-gray-200`}
             onMouseDown={mount}
             onMouseUp={unmount}
           />
-          <main className="h-[calc(100vh-3rem)] overflow-auto">
+          <main className="min-h-0 h-full">
             <Outlet />
           </main>
         </section>
