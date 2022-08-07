@@ -52,7 +52,7 @@ export default function () {
 
   return (
     <RecoilSyncIndexedDB>
-      <div className="grid h-screen">
+      <div className="grid h-screen w-screen">
         <Menu
           mode="horizontal"
           selectedKeys={[sidebarState]}
@@ -60,7 +60,7 @@ export default function () {
           className='[&>li]:leading-10'
         />
         <section
-          className="inline-grid min-h-0 h-full"
+          className="inline-grid min-h-0 h-full w-full min-w-0"
           style={{ gridTemplateColumns: "max-content max-content 1fr" }}
         >
           <aside
@@ -76,7 +76,7 @@ export default function () {
             onMouseDown={mount}
             onMouseUp={unmount}
           />
-          <main className="min-h-0 h-full">
+          <main className="min-h-0 h-full min-w-0 w-full">
             <Outlet />
           </main>
         </section>
