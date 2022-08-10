@@ -52,7 +52,7 @@ export default function () {
 
   return (
     <RecoilSyncIndexedDB>
-      <div className="grid h-screen w-screen">
+      <div className="grid h-screen w-screen" style={{ gridTemplateRows: 'max-content 1fr' }}>
         <Menu
           mode="horizontal"
           selectedKeys={[sidebarState]}
