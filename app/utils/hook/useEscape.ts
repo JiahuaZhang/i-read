@@ -4,7 +4,6 @@ export const useEscape = (ref: RefObject<HTMLElement>, triggerFn: () => void) =>
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (ref.current && !ref.current.contains(event.target as Node)) {
-        console.log('trigger outside?');
         triggerFn();
       }
     };
