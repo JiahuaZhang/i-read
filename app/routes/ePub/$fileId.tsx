@@ -24,7 +24,7 @@ enum SidebarState {
 }
 
 export default function () {
-  const [sidebarState, setSidebarState] = useState(SidebarState.Menu);
+  const [sidebarState, setSidebarState] = useState(SidebarState.Off);
   const { width, mount, unmount } = useResize();
 
   const toggleMenu = useCallback(

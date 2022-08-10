@@ -1,5 +1,5 @@
 import type EPub from "epub";
-import { useEffect, useMemo } from "react";
+import React, { useEffect, useMemo } from "react";
 import { Link, useNavigate, useParams } from "@remix-run/react";
 import { useMatchesData } from "~/utils";
 
@@ -13,8 +13,8 @@ const getAdjacentFlow = (id: string, flows: EPub.TocElement[]) => {
   ];
 };
 
-const renderPageNavigation = (fileId: string, siblings: (string | null)[]) => (
-  <div className="sticky top-0 grid grid-flow-col justify-between text-indigo-600">
+const renderPageNavigation = (fileId: string, siblings: (string | null)[], forwardRef: React.RefObject<HTMLDivElement>) => (
+  <div className="sticky top-0 grid grid-flow-col justify-between text-indigo-600" ref={forwardRef} >
     <Link
       className=" text-2xl hover:text-5xl"
       to={`/ePub/${fileId}/${siblings[0]}`}
@@ -30,7 +30,7 @@ const renderPageNavigation = (fileId: string, siblings: (string | null)[]) => (
   </div>
 );
 
-export const PageNavigationBar = () => {
+export const PageNavigationBar = ({ forwardRef }: { forwardRef: React.RefObject<HTMLDivElement>; }) => {
   const book = useMatchesData<EPub>("routes/ePub/$fileId");
   const { fileId, id } = useParams();
   const siblings = useMemo(
@@ -53,5 +53,5 @@ export const PageNavigationBar = () => {
     return () => document.removeEventListener("keyup", keyNavigate);
   }, [siblings, navigate, fileId]);
 
-  return renderPageNavigation(fileId!, siblings);
+  return renderPageNavigation(fileId!, siblings, forwardRef);
 };
