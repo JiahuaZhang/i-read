@@ -1,5 +1,7 @@
+import { CloseCircleFilled } from '@ant-design/icons';
 import { type LinksFunction, type LoaderFunction } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
+import { Modal } from 'antd';
 import { useRef, useState } from 'react';
 import { useRecoilValue } from "recoil";
 import { PageNavigationBar } from "~/components/ePub/PageNavigationBar";
@@ -27,11 +29,12 @@ enum ColorPanelDisplay {
 export default function () {
   const html = useLoaderData();
   const { config: { fontSize, chinseFontFamily, englishFontFamily } } = useRecoilValue(bookConfigState);
+  const [display, setDisplay] = useState(ColorPanelDisplay.off);
+  const [position, setPosition] = useState({ top: 0, left: 0 });
+  const [zoomInImg, setZoomInImg] = useState('');
   const containerRef = useRef<HTMLElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
   const navigationRef = useRef<HTMLDivElement>(null);
-  const [position, setPosition] = useState({ top: 0, left: 0 });
-  const [display, setDisplay] = useState(ColorPanelDisplay.off);
   useEscape(panelRef, () => setDisplay(ColorPanelDisplay.off));
 
   return (
@@ -41,7 +44,23 @@ export default function () {
         className={`${chinseFontFamily} ${englishFontFamily}`}
         style={{ fontSize }}
         dangerouslySetInnerHTML={{ __html: html }}
+        onDoubleClick={(event) => {
+          const target = event.target as HTMLElement;
+
+          if (target.tagName === 'IMG') {
+            const src = target.getAttribute('src') ?? '';
+            setZoomInImg(src);
+          }
+        }}
         onClick={(event) => {
+          const target = event.target as HTMLElement;
+
+          if (target.tagName === 'A') {
+            // todo, change navigation
+            // const href = target.getAttribute('href');
+            event.nativeEvent.preventDefault();
+          }
+
           const selection = window.getSelection();
           if (!selection?.toString()) return;
 
@@ -54,12 +73,28 @@ export default function () {
           setDisplay(ColorPanelDisplay.on);
         }}
       />
-      <div ref={panelRef} className='absolute inline-grid grid-flow-col gap-2 bg-orange-50 p-2 rounded'
-        style={{ ...position, display }}>
-        {
-          default_highlight_colors.map(color => <span key={color} className={`${color} w-6 h-6 inline-block rounded-full cursor-pointer`} />)
-        }
-      </div>
+      <div
+        ref={panelRef}
+        className="absolute inline-grid grid-flow-col gap-2 rounded bg-orange-50 p-2"
+        style={{ ...position, display }}
+      >
+        {default_highlight_colors.map((color) => (
+          <span
+            key={color}
+            className={`${color} inline-block h-6 w-6 cursor-pointer rounded-full`}
+          />
+        ))}
+      </div>;
+
+      <Modal
+        visible={Boolean(zoomInImg)}
+        footer={null}
+        onCancel={() => setZoomInImg("")}
+        closeIcon={<CloseCircleFilled className='text-rose-600' />}
+      >
+        <img className="mt-0" src={zoomInImg} />
+      </Modal>;
+
     </main>
   );
 }
