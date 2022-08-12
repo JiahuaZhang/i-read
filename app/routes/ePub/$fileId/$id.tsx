@@ -1,7 +1,7 @@
 import { CloseCircleFilled } from '@ant-design/icons';
 import { type LinksFunction, type LoaderFunction } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
-import { Modal } from 'antd';
+import { Modal, notification } from 'antd';
 import { useRef, useState } from 'react';
 import { useRecoilValue } from "recoil";
 import { PageNavigationBar } from "~/components/ePub/PageNavigationBar";
@@ -44,12 +44,21 @@ export default function () {
         className={`${chinseFontFamily} ${englishFontFamily}`}
         style={{ fontSize }}
         dangerouslySetInnerHTML={{ __html: html }}
-        onDoubleClick={(event) => {
+        onDoubleClick={async (event) => {
           const target = event.target as HTMLElement;
 
           if (target.tagName === 'IMG') {
             const src = target.getAttribute('src') ?? '';
             setZoomInImg(src);
+
+            const respones = await fetch(src);
+            const blob = respones.blob();
+            navigator.clipboard.write([
+              new ClipboardItem({
+                'image/png': blob,
+              })
+            ]);
+            notification.success({ message: 'Image copied', duration: 1.5 });
           }
         }}
         onClick={(event) => {

@@ -108,7 +108,7 @@ export const getEPubChater = async (epub: EPub, flow: string) => {
     if (!src) return rawAttributes;
 
     const base64 = await getImageAsBase64(epub, src);
-    rawAttributes.src = `data:image/jpeg;base64,${base64}`;
+    rawAttributes.src = `data:image/png;base64,${base64}`;
     return rawAttributes;
   };
 
