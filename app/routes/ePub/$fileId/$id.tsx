@@ -86,6 +86,7 @@ export default function () {
         ref={panelRef}
         className="absolute inline-grid grid-flow-col gap-2 rounded bg-orange-50 p-2"
         style={{ ...position, display }}
+        onMouseDown={event => event.preventDefault()}
       >
         {default_highlight_colors.map((color) => (
           <span
