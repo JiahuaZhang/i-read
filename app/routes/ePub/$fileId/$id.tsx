@@ -2,7 +2,10 @@ import { CloseCircleFilled } from '@ant-design/icons';
 import { type LinksFunction, type LoaderFunction } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
 import { Modal, notification } from 'antd';
-import { useRef, useState } from 'react';
+import rangy from 'rangy';
+import 'rangy/lib/rangy-classapplier';
+import 'rangy/lib/rangy-highlighter';
+import { useEffect, useRef, useState } from 'react';
 import { useRecoilValue } from "recoil";
 import { PageNavigationBar } from "~/components/ePub/PageNavigationBar";
 import fontCss from "~/styles/font.css";
@@ -32,15 +35,30 @@ export default function () {
   const [display, setDisplay] = useState(ColorPanelDisplay.off);
   const [position, setPosition] = useState({ top: 0, left: 0 });
   const [zoomInImg, setZoomInImg] = useState('');
+  const [highlighter, setHighlighter] = useState(null);
   const containerRef = useRef<HTMLElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
   const navigationRef = useRef<HTMLDivElement>(null);
+  const mainRef = useRef<HTMLDivElement>(null);
   useEscape(panelRef, () => setDisplay(ColorPanelDisplay.off));
+
+  useEffect(() => {
+    if (highlighter || !mainRef.current) return;
+
+    const h = rangy.createHighlighter();
+    default_highlight_colors.forEach(color =>
+      h.addClassApplier(rangy.createClassApplier(color))
+    );
+    setHighlighter(h);
+
+  }, [mainRef.current, highlighter, setHighlighter]);
 
   return (
     <main className='h-full min-h-0 overflow-y-auto relative' ref={containerRef}>
       <PageNavigationBar forwardRef={navigationRef} />
       <div
+        id='book'
+        ref={mainRef}
         className={`${chinseFontFamily} ${englishFontFamily}`}
         style={{ fontSize }}
         dangerouslySetInnerHTML={{ __html: html }}
@@ -90,6 +108,11 @@ export default function () {
       >
         {default_highlight_colors.map((color) => (
           <span
+            onClick={() => {
+              highlighter.highlightSelection(color, { containerElementId: 'book' });
+              setDisplay(ColorPanelDisplay.off);
+              document.getSelection()?.removeAllRanges();
+            }}
             key={color}
             className={`${color} inline-block h-6 w-6 cursor-pointer rounded-full`}
           />
