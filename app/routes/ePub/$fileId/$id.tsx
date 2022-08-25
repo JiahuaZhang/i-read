@@ -11,6 +11,7 @@ import { PageNavigationBar } from "~/components/ePub/PageNavigationBar";
 import fontCss from "~/styles/font.css";
 import { getCurrentEpubChapter } from "~/utils/google.drive.server";
 import { useEscape } from '~/utils/hook/useEscape';
+import { TextHighlight } from '~/utils/selection/TextNote';
 import { bookConfigState } from "~/utils/state/book.config";
 
 export const links: LinksFunction = () => [
@@ -104,7 +105,8 @@ export default function () {
         {default_highlight_colors.map((color) => (
           <span
             onClick={() => {
-              highlighter.highlightSelection(color, { containerElementId: 'book' });
+              const textHighlight = TextHighlight.create(highlighter, mainRef.current!, color);
+              textHighlight.highlight(highlighter);
               setDisplay(ColorPanelDisplay.off);
               document.getSelection()?.removeAllRanges();
             }}

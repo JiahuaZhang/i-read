@@ -16,18 +16,32 @@ interface HighlighterOptoin {
   containerElementId?: string;
 }
 
+interface CharacterRange {
+  backward: boolean;
+  characterRange: {
+    start: number;
+    end: number;
+  };
+}
+
+interface RangyConverter {
+  serializeSelection(selection: RangySelection, containerNode: Document | Window | HTMLIFrameElement | Element): CharacterRange[];
+}
+
 interface ClassApplier {
   applyToSelection(windows?: Window): void;
+}
+
+interface Highlighter {
+  converter: RangyConverter;
+  addClassApplier(applier: ClassApplier): void;
+  highlightSelection(className: string, options?: HighlighterOptoin): void;
+  deserialize(serialized: string): void;
 }
 
 interface RangyStatic {
   createHighlighter(doc?: Document | Window | HTMLIFrameElement, type?: string): Highlighter;
   createClassApplier(className: string, options?: ApplierOption, tagNames?: string[]): ClassApplier;
-}
-
-interface Highlighter {
-  addClassApplier(applier: ClassApplier): void;
-  highlightSelection(className: string, options?: HighlighterOptoin): void;
 }
 
 declare module 'rangy' {
