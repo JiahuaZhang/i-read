@@ -1,11 +1,11 @@
 import { CloseCircleFilled } from '@ant-design/icons';
 import { type LinksFunction, type LoaderFunction } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
-import { Modal, notification } from 'antd';
+import { Checkbox, Modal, notification } from 'antd';
 import rangy from 'rangy';
 import 'rangy/lib/rangy-classapplier';
 import 'rangy/lib/rangy-highlighter';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useRecoilValue } from "recoil";
 import { PageNavigationBar } from "~/components/ePub/PageNavigationBar";
 import fontCss from "~/styles/font.css";
@@ -30,10 +30,16 @@ enum ColorPanelDisplay {
   off = 'none'
 }
 
+enum ImagePanelDisplay {
+  on = '',
+  off = 'none'
+}
+
 export default function () {
   const html = useLoaderData();
   const { config: { fontSize, chinseFontFamily, englishFontFamily } } = useRecoilValue(bookConfigState);
-  const [display, setDisplay] = useState(ColorPanelDisplay.off);
+  const [colorPanelDisplay, setColorPanelDisplay] = useState(ColorPanelDisplay.off);
+  const [imagePanelDisplay, setImagePanelDisplay] = useState(ImagePanelDisplay.off);
   const [position, setPosition] = useState({ top: 0, left: 0 });
   const [zoomInImg, setZoomInImg] = useState('');
   const [highlighter] = useState(() => {
@@ -44,14 +50,33 @@ export default function () {
     return highlighter;
   });
   const containerRef = useRef<HTMLElement>(null);
-  const panelRef = useRef<HTMLDivElement>(null);
+  const colorPanelRef = useRef<HTMLDivElement>(null);
+  const imagePanelRef = useRef<HTMLInputElement | null>(null);
   const navigationRef = useRef<HTMLDivElement>(null);
   const mainRef = useRef<HTMLDivElement>(null);
-  useEscape(panelRef, () => setDisplay(ColorPanelDisplay.off));
+  useEscape(colorPanelRef, () => setColorPanelDisplay(ColorPanelDisplay.off));
+  useEscape(imagePanelRef, () => setImagePanelDisplay(ImagePanelDisplay.off));
+
+  useEffect(() => {
+    document.addEventListener('contextmenu', event => {
+      if ((event.target as Element).tagName !== 'IMG') return;
+
+      event.preventDefault();
+      // const imageHighlight = ImageHighlight.create(highlighter, (event.target) as Node, mainRef.current!);
+
+      const maxTop = containerRef.current!.scrollHeight - imagePanelRef.current!.offsetHeight;
+      const top = Math.min(containerRef.current!.scrollTop - navigationRef.current!.offsetHeight + event.pageY, maxTop);
+      const maxLeft = containerRef.current!.clientWidth - imagePanelRef.current!.clientWidth;
+      const left = Math.min(event.pageX, maxLeft);
+      setPosition({ top, left });
+      setImagePanelDisplay(ImagePanelDisplay.on);
+    });
+  }, []);
 
   return (
     <main className='h-full min-h-0 overflow-y-auto relative' ref={containerRef}>
       <PageNavigationBar forwardRef={navigationRef} />
+
       <div
         id='book'
         ref={mainRef}
@@ -88,18 +113,19 @@ export default function () {
           if (!selection?.toString()) return;
 
           event.nativeEvent.stopImmediatePropagation();
-          const maxTop = containerRef.current!.scrollHeight - panelRef.current!.offsetHeight;
+          const maxTop = containerRef.current!.scrollHeight - colorPanelRef.current!.offsetHeight;
           const top = Math.min(containerRef.current!.scrollTop - navigationRef.current!.offsetHeight + event.pageY, maxTop);
-          const maxLeft = containerRef.current!.clientWidth - panelRef.current!.clientWidth;
+          const maxLeft = containerRef.current!.clientWidth - colorPanelRef.current!.clientWidth;
           const left = Math.min(event.pageX, maxLeft);
           setPosition({ top, left });
-          setDisplay(ColorPanelDisplay.on);
+          setColorPanelDisplay(ColorPanelDisplay.on);
         }}
       />
+
       <div
-        ref={panelRef}
+        ref={colorPanelRef}
         className="absolute inline-grid grid-flow-col gap-2 rounded bg-orange-50 p-2"
-        style={{ ...position, display }}
+        style={{ ...position, display: colorPanelDisplay }}
         onMouseDown={event => event.preventDefault()}
       >
         {default_highlight_colors.map((color) => (
@@ -107,7 +133,7 @@ export default function () {
             onClick={() => {
               const textHighlight = TextHighlight.create(highlighter, mainRef.current!, color);
               textHighlight.highlight(highlighter);
-              setDisplay(ColorPanelDisplay.off);
+              setColorPanelDisplay(ColorPanelDisplay.off);
               document.getSelection()?.removeAllRanges();
             }}
             key={color}
@@ -115,6 +141,18 @@ export default function () {
           />
         ))}
       </div>;
+
+      <Checkbox
+        className='absolute p-2 bg-slate-50 rounded border-2 border-violet-600'
+        style={{ ...position, display: imagePanelDisplay }}
+        ref={r => {
+          if (!r) return;
+          imagePanelRef.current = (r as any).input; // eslint-disable-line
+        }}
+        onClick={e => e.nativeEvent.stopImmediatePropagation()}
+      >
+        <span onClick={e => e.nativeEvent.stopImmediatePropagation()} >image</span>
+      </Checkbox>
 
       <Modal
         visible={Boolean(zoomInImg)}

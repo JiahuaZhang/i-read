@@ -26,6 +26,7 @@ interface CharacterRange {
 
 interface RangyConverter {
   serializeSelection(selection: RangySelection, containerNode: Document | Window | HTMLIFrameElement | Element): CharacterRange[];
+  rangeToCharacterRange(selection: RangyRange, containerNode: Document | Window | HTMLIFrameElement | Element): CharacterRange.characterRange;
 }
 
 interface ClassApplier {

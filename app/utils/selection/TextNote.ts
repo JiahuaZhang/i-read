@@ -33,7 +33,7 @@ export class TextHighlight extends Highlight {
     highlight.deserialize(this.serialize());
   }
 
-  compareTo(other: Highlight) {
+  compareTo(other: Highlight): number {
     if (this.note.start !== other.note.start) return this.note.start - other.note.start;
 
     if (other instanceof TextHighlight) {

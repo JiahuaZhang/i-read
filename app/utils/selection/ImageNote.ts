@@ -1,3 +1,4 @@
+import rangy from 'rangy';
 import { Highlight, Note } from './Note';
 import { TextHighlight } from './TextNote';
 
@@ -8,7 +9,17 @@ export interface ImageNote extends Note {
 export class ImageHighlight extends Highlight {
   note = {} as ImageNote;
 
-  compareTo(other: Highlight) {
+  static create(highlighter: Highlighter, img: Node, container: Element) {
+    const range = rangy.createRange();
+    range.selectNode(img);
+    const { start } = highlighter.converter.rangeToCharacterRange(range, container);
+
+    const imageHighlight = new ImageHighlight();
+    imageHighlight.note = { start, created: new Date().getTime(), imageIndex: 0 };
+    return imageHighlight;
+  }
+
+  compareTo(other: Highlight): number {
     if (this.note.start !== other.note.start) return this.note.start - other.note.start;
 
     if (other instanceof ImageHighlight) {
