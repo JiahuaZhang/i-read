@@ -17,4 +17,8 @@ export class Highlight {
   serialize() {
     return '';
   }
+
+  equals(_: Highlight) {
+    return false;
+  }
 }

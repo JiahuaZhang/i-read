@@ -30,4 +30,11 @@ export class ImageHighlight extends Highlight {
 
     return 0;
   }
+
+  equals(other: Highlight) {
+    if (other instanceof ImageHighlight) {
+      return this.note.start === other.note.start;
+    }
+    return false;
+  }
 }

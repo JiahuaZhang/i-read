@@ -6,13 +6,15 @@ import rangy from 'rangy';
 import 'rangy/lib/rangy-classapplier';
 import 'rangy/lib/rangy-highlighter';
 import { useEffect, useRef, useState } from 'react';
-import { useRecoilValue } from "recoil";
+import { useRecoilState, useRecoilValue } from "recoil";
 import { PageNavigationBar } from "~/components/ePub/PageNavigationBar";
 import fontCss from "~/styles/font.css";
 import { getCurrentEpubChapter } from "~/utils/google.drive.server";
 import { useEscape } from '~/utils/hook/useEscape';
+import { ImageHighlight } from '~/utils/selection/ImageNote';
 import { TextHighlight } from '~/utils/selection/TextNote';
 import { bookConfigState } from "~/utils/state/book.config";
+import { highlightState } from '~/utils/state/highlight';
 
 export const links: LinksFunction = () => [
   { rel: "stylesheet", href: fontCss }
@@ -38,8 +40,10 @@ enum ImagePanelDisplay {
 export default function () {
   const html = useLoaderData();
   const { config: { fontSize, chinseFontFamily, englishFontFamily } } = useRecoilValue(bookConfigState);
+  const [highlights, setHighlights] = useRecoilState(highlightState);
   const [colorPanelDisplay, setColorPanelDisplay] = useState(ColorPanelDisplay.off);
   const [imagePanelDisplay, setImagePanelDisplay] = useState(ImagePanelDisplay.off);
+  const [recentImage, setRecentImage] = useState<ImageHighlight>();
   const [position, setPosition] = useState({ top: 0, left: 0 });
   const [zoomInImg, setZoomInImg] = useState('');
   const [highlighter] = useState(() => {
@@ -62,7 +66,9 @@ export default function () {
       if ((event.target as Element).tagName !== 'IMG') return;
 
       event.preventDefault();
-      // const imageHighlight = ImageHighlight.create(highlighter, (event.target) as Node, mainRef.current!);
+
+      const imageHighlight = ImageHighlight.create(highlighter, (event.target) as Node, mainRef.current!);
+      setRecentImage(imageHighlight);
 
       const maxTop = containerRef.current!.scrollHeight - imagePanelRef.current!.offsetHeight;
       const top = Math.min(containerRef.current!.scrollTop - navigationRef.current!.offsetHeight + event.pageY, maxTop);
@@ -135,6 +141,7 @@ export default function () {
               textHighlight.highlight(highlighter);
               setColorPanelDisplay(ColorPanelDisplay.off);
               document.getSelection()?.removeAllRanges();
+              setHighlights(prev => [...prev, textHighlight]);
             }}
             key={color}
             className={`${color} inline-block h-6 w-6 cursor-pointer rounded-full`}
@@ -150,6 +157,14 @@ export default function () {
           imagePanelRef.current = (r as any).input; // eslint-disable-line
         }}
         onClick={e => e.nativeEvent.stopImmediatePropagation()}
+        checked={highlights.some(h => h.equals(recentImage!))}
+        onChange={e => {
+          if (e.target.checked) {
+            setHighlights(prev => [...prev, recentImage!]);
+          } else {
+            setHighlights(prev => prev.filter(h => !h.equals(recentImage!)));
+          }
+        }}
       >
         <span onClick={e => e.nativeEvent.stopImmediatePropagation()} >image</span>
       </Checkbox>
