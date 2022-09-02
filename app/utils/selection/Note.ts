@@ -21,4 +21,11 @@ export class Highlight {
   equals(_: Highlight) {
     return false;
   }
+
+  contains(_: CharacterRange["characterRange"]) {
+    return false;
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  toggleSelect(_highlighter: Highlighter, _doc: Document, _node: Node) {}
 }

@@ -46,4 +46,16 @@ export class TextHighlight extends Highlight {
 
     return 0;
   }
+
+  contains(range: { start: number; end: number; }): boolean {
+    const { start, end } = range;
+    return this.note.start <= start && this.note.end >= end;
+  }
+
+  toggleSelect(highlighter: Highlighter, doc: Document, node: Node): void {
+    const { start, end } = this.note;
+    const range = highlighter.converter.characterRangeToRange(doc, { start, end }, node);
+    const selection = rangy.getSelection();
+    selection.addRange(range);
+  }
 }

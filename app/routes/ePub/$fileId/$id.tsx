@@ -5,7 +5,7 @@ import { Checkbox, Modal, notification } from 'antd';
 import rangy from 'rangy';
 import 'rangy/lib/rangy-classapplier';
 import 'rangy/lib/rangy-highlighter';
-import { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useRecoilState, useRecoilValue } from "recoil";
 import { PageNavigationBar } from "~/components/ePub/PageNavigationBar";
 import fontCss from "~/styles/font.css";
@@ -61,6 +61,16 @@ export default function () {
   useEscape(colorPanelRef, () => setColorPanelDisplay(ColorPanelDisplay.off));
   useEscape(imagePanelRef, () => setImagePanelDisplay(ImagePanelDisplay.off));
 
+  const getPosition = useCallback(
+    (panel: HTMLElement, event: MouseEvent | React.MouseEvent) => {
+      const maxTop = containerRef.current!.scrollHeight - panel.offsetHeight;
+      const top = Math.min(containerRef.current!.scrollTop - navigationRef.current!.offsetHeight + event.pageY, maxTop);
+      const maxLeft = containerRef.current!.clientWidth - panel.clientWidth;
+      const left = Math.min(event.pageX, maxLeft);
+
+      return { top, left };
+    }, [containerRef.current, navigationRef.current]);
+
   useEffect(() => {
     document.addEventListener('contextmenu', event => {
       if ((event.target as Element).tagName !== 'IMG') return;
@@ -69,12 +79,7 @@ export default function () {
 
       const imageHighlight = ImageHighlight.create(highlighter, (event.target) as Node, mainRef.current!);
       setRecentImage(imageHighlight);
-
-      const maxTop = containerRef.current!.scrollHeight - imagePanelRef.current!.offsetHeight;
-      const top = Math.min(containerRef.current!.scrollTop - navigationRef.current!.offsetHeight + event.pageY, maxTop);
-      const maxLeft = containerRef.current!.clientWidth - imagePanelRef.current!.clientWidth;
-      const left = Math.min(event.pageX, maxLeft);
-      setPosition({ top, left });
+      setPosition(getPosition(imagePanelRef.current!, event));
       setImagePanelDisplay(ImagePanelDisplay.on);
     });
   }, []);
@@ -107,23 +112,49 @@ export default function () {
           }
         }}
         onClick={(event) => {
+          if (colorPanelDisplay === ColorPanelDisplay.on) {
+            return;
+          }
+
           const target = event.target as HTMLElement;
 
           if (target.tagName === 'A') {
             // todo, change navigation
             // const href = target.getAttribute('href');
             event.nativeEvent.preventDefault();
+            return;
           }
 
           const selection = window.getSelection();
-          if (!selection?.toString()) return;
+          if (!selection?.toString()) {
+            console.log('no selection case');
+            if (target.tagName !== 'SPAN') {
+              return;
+            }
+
+            const classNames = [...target.classList];
+            if (!classNames.some(name => default_highlight_colors.includes(name))) {
+              return;
+            }
+
+            const range = rangy.createRange();
+            range.selectNode(target);
+            const characterRange = highlighter.converter.rangeToCharacterRange(range, mainRef.current!);
+            const index = highlights.findIndex(highlight => highlight.contains(characterRange));
+            const current = highlights[index];
+            current.toggleSelect(highlighter, document, mainRef.current!);
+
+            event.nativeEvent.stopImmediatePropagation();
+            setPosition(getPosition(colorPanelRef.current!, event));
+            setColorPanelDisplay(ColorPanelDisplay.on);
+
+            // todo, new state -- changing existing selection
+            // update color / delete
+            return;
+          }
 
           event.nativeEvent.stopImmediatePropagation();
-          const maxTop = containerRef.current!.scrollHeight - colorPanelRef.current!.offsetHeight;
-          const top = Math.min(containerRef.current!.scrollTop - navigationRef.current!.offsetHeight + event.pageY, maxTop);
-          const maxLeft = containerRef.current!.clientWidth - colorPanelRef.current!.clientWidth;
-          const left = Math.min(event.pageX, maxLeft);
-          setPosition({ top, left });
+          setPosition(getPosition(colorPanelRef.current!, event));
           setColorPanelDisplay(ColorPanelDisplay.on);
         }}
       />
