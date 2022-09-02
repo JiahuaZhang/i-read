@@ -6,29 +6,19 @@ export interface Note {
 export class Highlight {
   note = {} as Note;
 
-  compareTo(_: Highlight) {
-    return 0;
-  }
+  compareTo(_: Highlight) { return 0; }
 
-  compareByCreated(other: Highlight) {
-    return this.note.created - other.note.created;
-  }
+  compareByCreated(other: Highlight) { return this.note.created - other.note.created; }
 
-  serialize() {
-    return '';
-  }
+  changeClass(_: string) { return this; }
 
-  // eslint-disable-next-line @typescript-eslint/no-empty-function
-  highlight(_: Highlighter) {}
+  serialize() { return ''; }
 
-  equals(_: Highlight) {
-    return false;
-  }
+  highlight(_: Highlighter) { return this; }
 
-  contains(_: CharacterRange["characterRange"]) {
-    return false;
-  }
+  equals(_: Highlight) { return false; }
 
-  // eslint-disable-next-line @typescript-eslint/no-empty-function
-  toggleSelect(_highlighter: Highlighter, _doc: Document, _node: Node) {}
+  contains(_: CharacterRange["characterRange"]) { return false; }
+
+  toggleSelect(_highlighter: Highlighter, _doc: Document, _node: Node) { return this; }
 }

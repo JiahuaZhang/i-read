@@ -31,6 +31,7 @@ export class TextHighlight extends Highlight {
 
   highlight(highlight: Highlighter) {
     highlight.deserialize(this.serialize());
+    return this;
   }
 
   compareTo(other: Highlight): number {
@@ -52,10 +53,11 @@ export class TextHighlight extends Highlight {
     return this.note.start <= start && this.note.end >= end;
   }
 
-  toggleSelect(highlighter: Highlighter, doc: Document, node: Node): void {
+  toggleSelect(highlighter: Highlighter, doc: Document, node: Node) {
     const { start, end } = this.note;
     const range = highlighter.converter.characterRangeToRange(doc, { start, end }, node);
     const selection = rangy.getSelection();
     selection.addRange(range);
+    return this;
   }
 }
