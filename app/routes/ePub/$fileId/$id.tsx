@@ -60,7 +60,10 @@ export default function () {
   const imagePanelRef = useRef<HTMLInputElement | null>(null);
   const navigationRef = useRef<HTMLDivElement>(null);
   const mainRef = useRef<HTMLDivElement>(null);
-  useEscape(colorPanelRef, () => setColorPanelDisplay(ColorPanelDisplay.off));
+  useEscape(colorPanelRef, () => {
+    setColorPanelDisplay(ColorPanelDisplay.off);
+    setHighlightIndex(-1);
+  });
   useEscape(imagePanelRef, () => setImagePanelDisplay(ImagePanelDisplay.off));
 
   useEffect(() => {
