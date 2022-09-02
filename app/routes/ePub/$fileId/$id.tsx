@@ -108,28 +108,18 @@ export default function () {
         dangerouslySetInnerHTML={{ __html: html }}
         onDoubleClick={async (event) => {
           const target = event.target as HTMLElement;
+          if (target.tagName !== 'IMG') return;
 
-          if (target.tagName === 'IMG') {
-            const src = target.getAttribute('src') ?? '';
-            setZoomInImg(src);
-
-            const respones = await fetch(src);
-            const blob = respones.blob();
-            navigator.clipboard.write([
-              new ClipboardItem({
-                'image/png': blob,
-              })
-            ]);
-            notification.success({ message: 'Image copied', duration: 1.5 });
-          }
+          const src = target.getAttribute('src') ?? '';
+          setZoomInImg(src);
+          const blob = await (await fetch(src)).blob();
+          navigator.clipboard.write([new ClipboardItem({ 'image/png': blob, })]);
+          notification.success({ message: 'Image copied', duration: 1.5 });
         }}
         onClick={(event) => {
-          if (colorPanelDisplay === ColorPanelDisplay.on) {
-            return;
-          }
+          if (colorPanelDisplay === ColorPanelDisplay.on) return;
 
           const target = event.target as HTMLElement;
-
           if (target.tagName === 'A') {
             // todo, change navigation
             // const href = target.getAttribute('href');
@@ -139,15 +129,10 @@ export default function () {
 
           const selection = window.getSelection();
           if (!selection?.toString()) {
-            console.log('no selection case');
-            if (target.tagName !== 'SPAN') {
-              return;
-            }
+            if (target.tagName !== 'SPAN') return;
 
             const classNames = [...target.classList];
-            if (!classNames.some(name => default_highlight_colors.includes(name))) {
-              return;
-            }
+            if (!classNames.some(name => default_highlight_colors.includes(name))) return;
 
             const range = rangy.createRange();
             range.selectNode(target);
@@ -156,14 +141,6 @@ export default function () {
             setHighlightIndex(index);
             const current = highlights[index];
             current.toggleSelect(highlighter, document, mainRef.current!);
-
-            event.nativeEvent.stopImmediatePropagation();
-            setPosition(getPosition(colorPanelRef.current!, event));
-            setColorPanelDisplay(ColorPanelDisplay.on);
-
-            // todo, new state -- changing existing selection
-            // update color / delete
-            return;
           }
 
           event.nativeEvent.stopImmediatePropagation();
