@@ -1,4 +1,4 @@
-import { CloseCircleFilled } from '@ant-design/icons';
+import { CloseCircleFilled, DeleteFilled } from '@ant-design/icons';
 import { type LinksFunction, type LoaderFunction } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
 import { Checkbox, Modal, notification } from 'antd';
@@ -46,6 +46,8 @@ export default function () {
   const [recentImage, setRecentImage] = useState<ImageHighlight>();
   const [position, setPosition] = useState({ top: 0, left: 0 });
   const [zoomInImg, setZoomInImg] = useState('');
+  const [highlightIndex, setHighlightIndex] = useState(-1);
+  const [key, setKey] = useState(0);
   const [highlighter] = useState(() => {
     const highlighter = rangy.createHighlighter();
     default_highlight_colors.forEach(color =>
@@ -60,6 +62,12 @@ export default function () {
   const mainRef = useRef<HTMLDivElement>(null);
   useEscape(colorPanelRef, () => setColorPanelDisplay(ColorPanelDisplay.off));
   useEscape(imagePanelRef, () => setImagePanelDisplay(ImagePanelDisplay.off));
+
+  useEffect(() => {
+    if (key === 0) return;
+
+    highlights.forEach(highlight => highlight.highlight(highlighter));
+  }, [key]);
 
   const getPosition = useCallback(
     (panel: HTMLElement, event: MouseEvent | React.MouseEvent) => {
@@ -90,6 +98,7 @@ export default function () {
 
       <div
         id='book'
+        key={key}
         ref={mainRef}
         className={`${chinseFontFamily} ${englishFontFamily}`}
         style={{ fontSize }}
@@ -141,6 +150,7 @@ export default function () {
             range.selectNode(target);
             const characterRange = highlighter.converter.rangeToCharacterRange(range, mainRef.current!);
             const index = highlights.findIndex(highlight => highlight.contains(characterRange));
+            setHighlightIndex(index);
             const current = highlights[index];
             current.toggleSelect(highlighter, document, mainRef.current!);
 
@@ -161,7 +171,7 @@ export default function () {
 
       <div
         ref={colorPanelRef}
-        className="absolute inline-grid grid-flow-col gap-2 rounded bg-orange-50 p-2"
+        className="absolute inline-grid grid-flow-col gap-2 rounded bg-orange-50 p-2 items-center"
         style={{ ...position, display: colorPanelDisplay }}
         onMouseDown={event => event.preventDefault()}
       >
@@ -178,6 +188,15 @@ export default function () {
             className={`${color} inline-block h-6 w-6 cursor-pointer rounded-full`}
           />
         ))}
+        {highlightIndex !== -1 &&
+          <DeleteFilled className='text-fill text-red-600 ml-4 text-xl inline-grid cursor-pointer'
+            onClick={() => {
+              console.log('to delete');
+              setHighlights(prev => prev.filter((_, index) => index !== highlightIndex));
+              setColorPanelDisplay(ColorPanelDisplay.off);
+              setKey(value => value + 1);
+            }}
+          />}
       </div>;
 
       <Checkbox

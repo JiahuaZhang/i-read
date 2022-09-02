@@ -18,6 +18,9 @@ export class Highlight {
     return '';
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  highlight(_: Highlighter) {}
+
   equals(_: Highlight) {
     return false;
   }
