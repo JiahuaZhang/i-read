@@ -158,11 +158,37 @@ export default function () {
         {default_highlight_colors.map((color) => (
           <span
             onClick={() => {
-              const textHighlight = TextHighlight.create(highlighter, mainRef.current!, color);
-              textHighlight.highlight(highlighter);
-              setColorPanelDisplay(ColorPanelDisplay.off);
-              document.getSelection()?.removeAllRanges();
-              setHighlights(prev => [...prev, textHighlight]);
+              const cleanup = () => {
+                document.getSelection()?.removeAllRanges();
+                setColorPanelDisplay(ColorPanelDisplay.off);
+              };
+
+              if (highlightIndex !== -1) {
+                const currentHighlight = highlights[highlightIndex] as TextHighlight;
+                if (currentHighlight.note.className === color) return cleanup();
+
+                const range = currentHighlight.toRange(highlighter, document, mainRef.current!);
+                const updateClass = (node: Element) => {
+                  if (range.intersectsNode(node)) {
+                    if (node.tagName !== 'SPAN') {
+                      node.childNodes.forEach(n => updateClass(n as Element));
+                    } else {
+                      node.className = node.className.replace(currentHighlight.note.className, color);
+                    }
+                  }
+                };
+
+                range.commonAncestorContainer.childNodes.forEach(node => updateClass(node as Element));
+                const update = currentHighlight.changeClass(color);
+                setHighlights(prev => prev.map(val => val === currentHighlight ? update : val));
+                setHighlightIndex(-1);
+              } else {
+                const textHighlight = TextHighlight.create(highlighter, mainRef.current!, color);
+                textHighlight.highlight(highlighter);
+                setHighlights(prev => [...prev, textHighlight]);
+              }
+
+              cleanup();
             }}
             key={color}
             className={`${color} inline-block h-6 w-6 cursor-pointer rounded-full`}

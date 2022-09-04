@@ -10,18 +10,17 @@ export interface TextNote extends Note {
 export class TextHighlight extends Highlight {
   note = {} as TextNote;
 
+  constructor(note: TextNote) { super(note); this.note = note; }
+
   static create(highlighter: Highlighter, element: Element, className: string) {
     const range = highlighter.converter.serializeSelection(rangy.getSelection(), element)[0];
     const { characterRange: { start, end } } = range;
 
-    const textHighlight = new TextHighlight();
-    textHighlight.note = { className, start, end, created: new Date().getTime() };
-    return textHighlight;
+    return new TextHighlight({ className, start, end, created: new Date().getTime() });
   }
 
   changeClass(className: string) {
-    this.note.className = className;
-    return this;
+    return new TextHighlight({ ...this.note, created: new Date().getTime(), className });
   }
 
   serialize() {
@@ -59,5 +58,10 @@ export class TextHighlight extends Highlight {
     const selection = rangy.getSelection();
     selection.addRange(range);
     return this;
+  }
+
+  toRange(highlighter: Highlighter, doc: Document, node: Node) {
+    const { start, end } = this.note;
+    return highlighter.converter.characterRangeToRange(doc, { start, end }, node);
   }
 }

@@ -34,11 +34,16 @@ interface ClassApplier {
   applyToSelection(windows?: Window): void;
 }
 
+interface Highlight {
+  unapply(): void;
+}
+
 interface Highlighter {
   converter: RangyConverter;
   addClassApplier(applier: ClassApplier): void;
   highlightSelection(className: string, options?: HighlighterOptoin): void;
   deserialize(serialized: string): void;
+  highlights: Highlight[];
 }
 
 interface RangyStatic {
