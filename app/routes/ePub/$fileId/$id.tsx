@@ -73,11 +73,11 @@ export default function () {
   }, [key]);
 
   const getPosition = useCallback(
-    (panel: HTMLElement, event: MouseEvent | React.MouseEvent) => {
+    (panel: HTMLElement, event: MouseEvent) => {
       const maxTop = containerRef.current!.scrollHeight - panel.offsetHeight;
       const top = Math.min(containerRef.current!.scrollTop - navigationRef.current!.offsetHeight + event.pageY, maxTop);
       const maxLeft = containerRef.current!.clientWidth - panel.clientWidth;
-      const left = Math.min(event.pageX, maxLeft);
+      const left = Math.min(event.offsetX, maxLeft);
 
       return { top, left };
     }, [containerRef.current, navigationRef.current]);
@@ -144,7 +144,7 @@ export default function () {
           }
 
           event.nativeEvent.stopImmediatePropagation();
-          setPosition(getPosition(colorPanelRef.current!, event));
+          setPosition(getPosition(colorPanelRef.current!, event.nativeEvent));
           setColorPanelDisplay(ColorPanelDisplay.on);
         }}
       />
