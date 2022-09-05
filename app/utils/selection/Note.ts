@@ -3,10 +3,19 @@ export interface Note {
   created: number;
 }
 
+export type HighlighterInfo = {
+  highlighter: Highlighter,
+  doc: Document,
+  container: Node;
+};
+
 export class Highlight {
   note = {} as Note;
+  elements: Element[] = [];
 
   constructor(note: Note) { this.note = note; }
+
+  hydrate(_: HighlighterInfo) { return new Highlight(this.note); }
 
   compareTo(_: Highlight) { return 0; }
 
@@ -22,7 +31,7 @@ export class Highlight {
 
   contains(_: CharacterRange["characterRange"]) { return false; }
 
-  toggleSelect(_highlighter: Highlighter, _doc: Document, _node: Node) { return this; }
+  toggleSelect(_: HighlighterInfo) { return this; }
 
-  toRange(_highlighter: Highlighter, _doc: Document, _node: Node): Range { return {} as Range; }
+  toRange(_: HighlighterInfo): Range { return {} as Range; }
 }

@@ -34,7 +34,7 @@ interface ClassApplier {
   applyToSelection(windows?: Window): void;
 }
 
-interface Highlight {
+interface RangyHighlight {
   unapply(): void;
 }
 
@@ -43,7 +43,7 @@ interface Highlighter {
   addClassApplier(applier: ClassApplier): void;
   highlightSelection(className: string, options?: HighlighterOptoin): void;
   deserialize(serialized: string): void;
-  highlights: Highlight[];
+  highlights: RangyHighlight[];
 }
 
 interface RangyStatic {

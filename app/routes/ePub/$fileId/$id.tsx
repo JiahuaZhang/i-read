@@ -140,11 +140,12 @@ export default function () {
             const index = highlights.findIndex(highlight => highlight.contains(characterRange));
             setHighlightIndex(index);
             const current = highlights[index];
-            current.toggleSelect(highlighter, document, mainRef.current!);
+            current.toggleSelect({ highlighter, doc: document, container: mainRef.current! });
           }
 
           event.nativeEvent.stopImmediatePropagation();
           setPosition(getPosition(colorPanelRef.current!, event.nativeEvent));
+          setImagePanelDisplay(ImagePanelDisplay.off);
           setColorPanelDisplay(ColorPanelDisplay.on);
         }}
       />
@@ -167,7 +168,7 @@ export default function () {
                 const currentHighlight = highlights[highlightIndex] as TextHighlight;
                 if (currentHighlight.note.className === color) return cleanup();
 
-                const range = currentHighlight.toRange(highlighter, document, mainRef.current!);
+                const range = currentHighlight.toRange({ highlighter, doc: document, container: mainRef.current! });
                 const updateClass = (node: Element) => {
                   if (range.intersectsNode(node)) {
                     if (node.tagName !== 'SPAN') {

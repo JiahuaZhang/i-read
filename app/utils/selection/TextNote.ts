@@ -1,6 +1,6 @@
 import rangy from 'rangy';
 import { ImageHighlight } from './ImageNote';
-import { Highlight, Note } from './Note';
+import { Highlight, HighlighterInfo, Note } from './Note';
 
 export interface TextNote extends Note {
   end: number;
@@ -12,11 +12,30 @@ export class TextHighlight extends Highlight {
 
   constructor(note: TextNote) { super(note); this.note = note; }
 
-  static create(highlighter: Highlighter, element: Element, className: string) {
-    const range = highlighter.converter.serializeSelection(rangy.getSelection(), element)[0];
+  static create(highlighter: Highlighter, container: Element, className: string) {
+    const range = highlighter.converter.serializeSelection(rangy.getSelection(), container)[0];
     const { characterRange: { start, end } } = range;
 
-    return new TextHighlight({ className, start, end, created: new Date().getTime() });
+    const textHighlight = new TextHighlight({ className, start, end, created: new Date().getTime() });
+    return textHighlight.hydrate({ highlighter, doc: document, container });
+  }
+
+  hydrate({ highlighter, doc, container }: HighlighterInfo) {
+    const textHighlight = new TextHighlight(this.note);
+    const range = textHighlight.toRange({ highlighter, doc, container });
+
+    const addElement = (node: Element) => {
+      if (range.intersectsNode(node)) {
+        if (node.tagName !== 'SPAN') {
+          node.childNodes.forEach(node => addElement(node as Element));
+        } else {
+          textHighlight.elements.push(node);
+        }
+      }
+    };
+
+    range.commonAncestorContainer.childNodes.forEach(node => addElement(node as Element));
+    return textHighlight;
   }
 
   changeClass(className: string) {
@@ -52,16 +71,16 @@ export class TextHighlight extends Highlight {
     return this.note.start <= start && this.note.end >= end;
   }
 
-  toggleSelect(highlighter: Highlighter, doc: Document, node: Node) {
+  toggleSelect({ highlighter, doc, container }: HighlighterInfo) {
     const { start, end } = this.note;
-    const range = highlighter.converter.characterRangeToRange(doc, { start, end }, node);
+    const range = highlighter.converter.characterRangeToRange(doc, { start, end }, container);
     const selection = rangy.getSelection();
     selection.addRange(range);
     return this;
   }
 
-  toRange(highlighter: Highlighter, doc: Document, node: Node) {
+  toRange({ highlighter, doc, container }: HighlighterInfo) {
     const { start, end } = this.note;
-    return highlighter.converter.characterRangeToRange(doc, { start, end }, node);
+    return highlighter.converter.characterRangeToRange(doc, { start, end }, container);
   }
 }
