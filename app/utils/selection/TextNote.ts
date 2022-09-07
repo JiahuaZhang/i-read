@@ -17,29 +17,22 @@ export class TextHighlight extends Highlight {
     const { characterRange: { start, end } } = range;
 
     const textHighlight = new TextHighlight({ className, start, end, created: new Date().getTime() });
+    textHighlight.highlight(highlighter);
     return textHighlight.hydrate({ highlighter, doc: document, container });
   }
 
   hydrate({ highlighter, doc, container }: HighlighterInfo) {
     const textHighlight = new TextHighlight(this.note);
     const range = textHighlight.toRange({ highlighter, doc, container });
+    textHighlight.elements = range.getNodes([], node => (node as Element)?.className?.includes(textHighlight.note.className));
 
-    const addElement = (node: Element) => {
-      if (range.intersectsNode(node)) {
-        if (node.tagName !== 'SPAN') {
-          node.childNodes.forEach(node => addElement(node as Element));
-        } else {
-          textHighlight.elements.push(node);
-        }
-      }
-    };
-
-    range.commonAncestorContainer.childNodes.forEach(node => addElement(node as Element));
     return textHighlight;
   }
 
   changeClass(className: string) {
-    return new TextHighlight({ ...this.note, created: new Date().getTime(), className });
+    const textHighlight = new TextHighlight({ ...this.note, created: new Date().getTime(), className });
+    textHighlight.elements = this.elements;
+    return textHighlight;
   }
 
   serialize() {

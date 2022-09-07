@@ -1,11 +1,11 @@
 import { CloseCircleFilled, DeleteFilled } from '@ant-design/icons';
 import { type LinksFunction, type LoaderFunction } from "@remix-run/node";
-import { useLoaderData } from "@remix-run/react";
+import { useLoaderData, useParams } from "@remix-run/react";
 import { Checkbox, Modal, notification } from 'antd';
 import rangy from 'rangy';
 import 'rangy/lib/rangy-classapplier';
 import 'rangy/lib/rangy-highlighter';
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useRecoilState, useRecoilValue } from "recoil";
 import { PageNavigationBar } from "~/components/ePub/PageNavigationBar";
 import fontCss from "~/styles/font.css";
@@ -40,6 +40,7 @@ enum ImagePanelDisplay {
 export default function () {
   const html = useLoaderData();
   const { config: { fontSize, chinseFontFamily, englishFontFamily } } = useRecoilValue(bookConfigState);
+  const params = useParams();
   const [highlights, setHighlights] = useRecoilState(highlightState);
   const [colorPanelDisplay, setColorPanelDisplay] = useState(ColorPanelDisplay.off);
   const [imagePanelDisplay, setImagePanelDisplay] = useState(ImagePanelDisplay.off);
@@ -61,10 +62,16 @@ export default function () {
   const navigationRef = useRef<HTMLDivElement>(null);
   const mainRef = useRef<HTMLDivElement>(null);
   useEscape(colorPanelRef, () => {
+    // todo, in extreme select case, color panel won't be showing
     setColorPanelDisplay(ColorPanelDisplay.off);
     setHighlightIndex(-1);
   });
   useEscape(imagePanelRef, () => setImagePanelDisplay(ImagePanelDisplay.off));
+
+  useEffect(() => {
+    // todo? init from database correctly in future
+    setHighlights([]);
+  }, [params]);
 
   useEffect(() => {
     if (key === 0) return;
@@ -185,7 +192,6 @@ export default function () {
                 setHighlightIndex(-1);
               } else {
                 const textHighlight = TextHighlight.create(highlighter, mainRef.current!, color);
-                textHighlight.highlight(highlighter);
                 setHighlights(prev => [...prev, textHighlight]);
               }
 

@@ -24,10 +24,14 @@ interface CharacterRange {
   };
 }
 
+interface RangyRange extends Range {
+  getNodes(type?: number[], filter?: (n: node) => boolean);
+}
+
 interface RangyConverter {
   serializeSelection(selection: RangySelection, containerNode: Document | Window | HTMLIFrameElement | Element): CharacterRange[];
   rangeToCharacterRange(selection: RangyRange, containerNode: Document | Window | HTMLIFrameElement | Element): CharacterRange.characterRange;
-  characterRangeToRange(doc: Document | Window | HTMLIFrameElement, characterRange: CharacterRange.characterRange, containerNode: Element | Node): Range;
+  characterRangeToRange(doc: Document | Window | HTMLIFrameElement, characterRange: CharacterRange.characterRange, containerNode: Element | Node): RangyRange;
 }
 
 interface ClassApplier {
