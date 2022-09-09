@@ -192,7 +192,7 @@ export default function () {
                 setHighlightIndex(-1);
               } else {
                 const textHighlight = TextHighlight.create(highlighter, mainRef.current!, color);
-                setHighlights(prev => [...prev, textHighlight]);
+                setHighlights(prev => [...prev, textHighlight].sort((a, b) => a.compareTo(b)));
               }
 
               cleanup();
@@ -223,7 +223,7 @@ export default function () {
         checked={highlights.some(h => h.equals(recentImage!))}
         onChange={e => {
           if (e.target.checked) {
-            setHighlights(prev => [...prev, recentImage!]);
+            setHighlights(prev => [...prev, recentImage!].sort((a, b) => a.compareTo(b)));
           } else {
             setHighlights(prev => prev.filter(h => !h.equals(recentImage!)));
           }
