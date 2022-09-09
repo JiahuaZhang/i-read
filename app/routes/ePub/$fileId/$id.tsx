@@ -14,7 +14,7 @@ import { useEscape } from '~/utils/hook/useEscape';
 import { ImageHighlight } from '~/utils/selection/ImageNote';
 import { TextHighlight } from '~/utils/selection/TextNote';
 import { bookConfigState } from "~/utils/state/book.config";
-import { highlightState } from '~/utils/state/highlight';
+import { highlightState, mainKeyState } from '~/utils/state/highlight';
 
 export const links: LinksFunction = () => [
   { rel: "stylesheet", href: fontCss }
@@ -48,7 +48,7 @@ export default function () {
   const [position, setPosition] = useState({ top: 0, left: 0 });
   const [zoomInImg, setZoomInImg] = useState('');
   const [highlightIndex, setHighlightIndex] = useState(-1);
-  const [key, setKey] = useState(0);
+  const [key, setKey] = useRecoilState(mainKeyState);
   const [highlighter] = useState(() => {
     const highlighter = rangy.createHighlighter();
     default_highlight_colors.forEach(color =>
