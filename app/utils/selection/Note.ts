@@ -34,4 +34,6 @@ export class Highlight {
   toggleSelect(_: HighlighterInfo) { return this; }
 
   toRange(_: HighlighterInfo): Range { return {} as Range; }
+
+  toElements() { return [] as string[]; }
 }

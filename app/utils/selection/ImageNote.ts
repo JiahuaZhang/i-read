@@ -52,4 +52,8 @@ export class ImageHighlight extends Highlight {
     const { start } = this.note;
     return highlighter.converter.characterRangeToRange(doc, { start, end: start }, container);
   }
+
+  toElements() {
+    return [this.elements[0].outerHTML];
+  }
 }

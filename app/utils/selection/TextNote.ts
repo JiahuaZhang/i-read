@@ -1,18 +1,28 @@
 import rangy from 'rangy';
+import { default_highlight_colors } from '~/routes/ePub/$fileId/$id';
 import { ImageHighlight } from './ImageNote';
 import { Highlight, HighlighterInfo, Note } from './Note';
 
 export interface TextNote extends Note {
   end: number;
-  className: string;
+  className: typeof default_highlight_colors[number];
 }
+
+const colors: { [key in typeof default_highlight_colors[number]]: string } = {
+  'bg-amber-400': '#fbbf24',
+  'bg-blue-500': '',
+  'bg-green-400': '#4ade80',
+  'bg-pink-400': '',
+  'bg-purple-400': '',
+  'bg-red-600': '#dc2626'
+};
 
 export class TextHighlight extends Highlight {
   note = {} as TextNote;
 
   constructor(note: TextNote) { super(note); this.note = note; }
 
-  static create(highlighter: Highlighter, container: Element, className: string) {
+  static create(highlighter: Highlighter, container: Element, className: typeof default_highlight_colors[number]) {
     const range = highlighter.converter.serializeSelection(rangy.getSelection(), container)[0];
     const { characterRange: { start, end } } = range;
 
@@ -29,7 +39,7 @@ export class TextHighlight extends Highlight {
     return textHighlight;
   }
 
-  changeClass(className: string) {
+  changeClass(className: typeof default_highlight_colors[number]) {
     const textHighlight = new TextHighlight({ ...this.note, created: new Date().getTime(), className });
     textHighlight.elements = this.elements;
     return textHighlight;
@@ -75,5 +85,15 @@ export class TextHighlight extends Highlight {
   toRange({ highlighter, doc, container }: HighlighterInfo) {
     const { start, end } = this.note;
     return highlighter.converter.characterRangeToRange(doc, { start, end }, container);
+  }
+
+  toElements() {
+    return this.elements.filter(e => e.innerHTML !== '\n')
+      .map(e => {
+        const p = document.createElement('p');
+        p.innerHTML = e.innerHTML;
+        p.style.backgroundColor = colors[this.note.className];
+        return p.outerHTML;
+      });
   }
 }
