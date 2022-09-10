@@ -13,7 +13,8 @@ const renderHighlight = (highlight: Highlight, index: number, _: Highlight[]) =>
     return <li key={index} className={`${highlight.note.className}`}>
       {highlight.elements
         .filter(element => element.innerHTML !== '\n')
-        .map((element, i) => <p key={i}> {element.innerHTML} </p>)}
+        .map((element, i) =>
+          <p onDoubleClick={() => element.scrollIntoView()} key={i}> {element.innerHTML} </p>)}
     </li>;
   }
 
@@ -21,7 +22,9 @@ const renderHighlight = (highlight: Highlight, index: number, _: Highlight[]) =>
     const img = highlight.elements[0];
     return (
       <li key={index}>
-        <img src={img.getAttribute('src') ?? ''} alt={img.getAttribute('alt') ?? ''} />
+        <img onDoubleClick={() => img.scrollIntoView()}
+          src={img.getAttribute('src') ?? ''}
+          alt={img.getAttribute('alt') ?? ''} />
       </li>
     );
   }
@@ -30,9 +33,6 @@ const renderHighlight = (highlight: Highlight, index: number, _: Highlight[]) =>
 };
 
 export const Note = () => {
-  // todo
-  // one click copy all
-  // one click navigate
   const [highlights, setHighlights] = useRecoilState(highlightState);
   const setMainKey = useSetRecoilState(mainKeyState);
   const [confirmDelte, setConfirmDelte] = useState(false);
