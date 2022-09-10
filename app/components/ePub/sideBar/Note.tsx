@@ -40,7 +40,16 @@ export const Note = () => {
 
   return <div>
     <div className='text-3xl inline-grid grid-flow-col justify-between w-full p-2'>
-      <CopyFilled className='text-blue-400 cursor-pointer hover:text-blue-800' />
+      <CopyFilled
+        onClick={async () => {
+          const contents = highlights.map(h => h.toElements()).flat();
+          const type = 'text/html';
+          navigator.clipboard.write([
+            new ClipboardItem({ [type]: new Blob(contents, { type }) })
+          ]);
+          notification.success({ message: 'copied!', duration: 1.5 });
+        }}
+        className='text-blue-400 cursor-pointer hover:text-blue-800' />
 
       {!confirmDelte
         && <DeleteFilled
