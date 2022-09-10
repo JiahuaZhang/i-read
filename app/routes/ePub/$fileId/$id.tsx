@@ -25,7 +25,7 @@ export const loader: LoaderFunction = async ({ params }) => {
   return getCurrentEpubChapter(id!);
 };
 
-const default_highlight_colors = ['bg-red-600', 'bg-amber-400', 'bg-green-400', 'bg-blue-500', 'bg-purple-400', 'bg-pink-400'];
+export const default_highlight_colors = ['bg-red-600', 'bg-amber-400', 'bg-green-400', 'bg-blue-500', 'bg-purple-400', 'bg-pink-400'] as const;
 
 enum ColorPanelDisplay {
   on = 'inline-grid',
@@ -139,7 +139,7 @@ export default function () {
             if (target.tagName !== 'SPAN') return;
 
             const classNames = [...target.classList];
-            if (!classNames.some(name => default_highlight_colors.includes(name))) return;
+            if (!default_highlight_colors.some(color => classNames.includes(color))) return;
 
             const range = rangy.createRange();
             range.selectNode(target);
