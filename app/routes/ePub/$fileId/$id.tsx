@@ -177,12 +177,12 @@ export default function () {
 
                 const range = currentHighlight.toRange({ highlighter, doc: document, container: mainRef.current! });
                 const updateClass = (node: Element) => {
-                  if (range.intersectsNode(node)) {
-                    if (node.tagName !== 'SPAN') {
-                      node.childNodes.forEach(n => updateClass(n as Element));
-                    } else {
-                      node.className = node.className.replace(currentHighlight.note.className, color);
-                    }
+                  if (!range.intersectsNode(node)) return;
+
+                  if (node.tagName === 'SPAN' && node.className.includes(currentHighlight.note.className)) {
+                    node.className = node.className.replace(currentHighlight.note.className, color);
+                  } else {
+                    node.childNodes.forEach(n => updateClass(n as Element));
                   }
                 };
 
