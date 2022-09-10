@@ -113,14 +113,15 @@ export default function () {
         className={`${chinseFontFamily} ${englishFontFamily}`}
         style={{ fontSize }}
         dangerouslySetInnerHTML={{ __html: html }}
-        onDoubleClick={async (event) => {
+        onDoubleClick={(event) => {
           const target = event.target as HTMLElement;
           if (target.tagName !== 'IMG') return;
 
           const src = target.getAttribute('src') ?? '';
           setZoomInImg(src);
-          const blob = await (await fetch(src)).blob();
-          navigator.clipboard.write([new ClipboardItem({ 'image/png': blob, })]);
+          navigator.clipboard.write([
+            new ClipboardItem({ 'text/html': new Blob([target.outerHTML], { type: 'text/html' }) })
+          ]);
           notification.success({ message: 'Image copied', duration: 1.5 });
         }}
         onClick={(event) => {
