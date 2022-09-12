@@ -1,5 +1,5 @@
 import { CloseCircleFilled, DeleteFilled } from '@ant-design/icons';
-import { type LinksFunction, type LoaderFunction } from "@remix-run/node";
+import { MetaFunction, type LinksFunction, type LoaderFunction } from "@remix-run/node";
 import { useLoaderData, useParams } from "@remix-run/react";
 import { Checkbox, Modal, notification } from 'antd';
 import rangy from 'rangy';
@@ -19,6 +19,8 @@ import { highlightState, mainKeyState } from '~/utils/state/highlight';
 export const links: LinksFunction = () => [
   { rel: "stylesheet", href: fontCss }
 ];
+
+export const meta: MetaFunction = ({ params: { id } }) => ({ title: `ePub ${id}` });
 
 export const loader: LoaderFunction = async ({ params }) => {
   const { id } = params;

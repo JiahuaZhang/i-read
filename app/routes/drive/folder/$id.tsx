@@ -1,13 +1,15 @@
 import { Breadcrumb } from "antd";
 import { type drive_v3 } from "googleapis";
-import { type LoaderFunction, redirect } from "@remix-run/node";
+import { type LoaderFunction, redirect, MetaFunction } from "@remix-run/node";
 import { Link, useLoaderData } from "@remix-run/react";
 import { FileLink } from "~/components/FileLink";
 import { FolderLink } from "~/components/FolderLink";
 import { getAllParents, getFolderFiles } from "~/utils/google.drive.server";
 import { isGoogleFolder } from "..";
 
-export const loader: LoaderFunction = async ({ request, params }) => {
+export const meta: MetaFunction = ({ params: { id = '' } }) => ({ title: `Folder ${id}` });
+
+export const loader: LoaderFunction = async ({ params }) => {
   const { id } = params;
 
   if (!id) {
@@ -22,7 +24,7 @@ export const loader: LoaderFunction = async ({ request, params }) => {
 
 export default function () {
   const { parents, kids } = useLoaderData<{
-    parents: { name: string; id: string }[];
+    parents: { name: string; id: string; }[];
     kids: drive_v3.Schema$FileList;
   }>();
   const allFolder = kids.files?.filter(isGoogleFolder) || [];

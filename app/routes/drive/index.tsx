@@ -1,5 +1,5 @@
 import { type drive_v3 } from "googleapis";
-import { type LoaderFunction } from "@remix-run/node";
+import { MetaFunction, type LoaderFunction } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
 import { FileLink } from "~/components/FileLink";
 import { FolderLink } from "~/components/FolderLink";
@@ -9,6 +9,8 @@ import { getFolderFiles } from "~/utils/google.drive.server";
 export const GOOGLE_FOLDER_TYPE = "application/vnd.google-apps.folder";
 export const isGoogleFolder = (file: drive_v3.Schema$File) =>
   file.mimeType === GOOGLE_FOLDER_TYPE;
+
+export const meta: MetaFunction = () => ({ title: "Drive" });
 
 export const loader: LoaderFunction = async ({ request }) => {
   await requireUser(request);
