@@ -8,6 +8,9 @@ export interface TextNote extends Note {
   className: typeof default_highlight_colors[number];
 }
 
+export const isTextNote = (note: Note): note is TextNote => typeof (note as TextNote).end === 'number'
+  && typeof (note as TextNote).className === 'string';
+
 const colors: { [key in typeof default_highlight_colors[number]]: string } = {
   'bg-amber-400': '#fbbf24',
   'bg-blue-500': '',
@@ -32,6 +35,7 @@ export class TextHighlight extends Highlight {
   }
 
   hydrate({ highlighter, doc, container }: HighlighterInfo) {
+    this.highlight(highlighter);
     const textHighlight = new TextHighlight(this.note);
     const range = textHighlight.toRange({ highlighter, doc, container });
     textHighlight.elements = range.getNodes([], node => (node as Element)?.className?.includes(textHighlight.note.className));

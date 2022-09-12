@@ -1,4 +1,4 @@
-import { array, dict, number, object, string } from "@recoiljs/refine";
+import { array, dict, number, object, string, optional } from "@recoiljs/refine";
 import { atom } from "recoil";
 import { syncEffect } from "recoil-sync";
 import { Note } from '../selection/Note';
@@ -51,8 +51,8 @@ export const bookConfigState = atom({
           notes: dict(array(object({
             start: number(),
             created: number(),
-            end: number(),
-            className: string(),
+            end: optional(number()),
+            className: optional(string()),
           })))
         })
       })

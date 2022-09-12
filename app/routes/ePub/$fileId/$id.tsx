@@ -12,13 +12,11 @@ import fontCss from "~/styles/font.css";
 import { getCurrentEpubChapter } from "~/utils/google.drive.server";
 import { useEscape } from '~/utils/hook/useEscape';
 import { ImageHighlight } from '~/utils/selection/ImageNote';
-import { TextHighlight } from '~/utils/selection/TextNote';
+import { isTextNote, TextHighlight } from '~/utils/selection/TextNote';
 import { bookConfigState } from "~/utils/state/book.config";
 import { highlightState, mainKeyState } from '~/utils/state/highlight';
 
-export const links: LinksFunction = () => [
-  { rel: "stylesheet", href: fontCss }
-];
+export const links: LinksFunction = () => [{ rel: "stylesheet", href: fontCss }];
 
 export const meta: MetaFunction = ({ params: { id } }) => ({ title: `ePub ${id}` });
 
@@ -42,7 +40,7 @@ enum ImagePanelDisplay {
 export default function () {
   const html = useLoaderData();
   const [bookConfig, setBookConfig] = useRecoilState(bookConfigState);
-  const params = useParams();
+  const { id = '' } = useParams();
   const [highlights, setHighlights] = useRecoilState(highlightState);
   const [colorPanelDisplay, setColorPanelDisplay] = useState(ColorPanelDisplay.off);
   const [imagePanelDisplay, setImagePanelDisplay] = useState(ImagePanelDisplay.off);
@@ -71,20 +69,27 @@ export default function () {
   useEscape(imagePanelRef, () => setImagePanelDisplay(ImagePanelDisplay.off));
 
   useEffect(() => {
-    const { id = '' } = params;
-    if (id !== bookConfig.track.page) {
-      setBookConfig(prev => ({ ...prev, track: { ...prev.track, page: id } }));
-    }
+    if (id === bookConfig.track.page) return;
 
-    // todo? init from database correctly in future
-    setHighlights([]);
-  }, [params]);
+    setBookConfig(prev => ({ ...prev, track: { ...prev.track, page: id } }));
+
+    const notes = bookConfig.track.notes[id] ?? [];
+    const cachedHighlights = notes.map(n => isTextNote(n) ? new TextHighlight(n) : new ImageHighlight(n));
+    setHighlights(
+      cachedHighlights.map(h => h.hydrate({ highlighter, doc: document, container: mainRef.current! }))
+    );
+  }, [id]);
 
   useEffect(() => {
     if (key === 0) return;
 
     highlights.forEach(highlight => highlight.highlight(highlighter));
   }, [key]);
+
+  useEffect(() => {
+    const notes = highlights.map(h => h.note);
+    setBookConfig(prev => ({ ...prev, track: { ...prev.track, notes: { ...prev.track.notes, [id]: notes } } }));
+  }, [highlights]);
 
   const getPosition = useCallback(
     (panel: HTMLElement, event: MouseEvent) => {
