@@ -6,7 +6,7 @@ import rangy from 'rangy';
 import 'rangy/lib/rangy-classapplier';
 import 'rangy/lib/rangy-highlighter';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { useRecoilState, useRecoilValue } from "recoil";
+import { useRecoilState } from "recoil";
 import { PageNavigationBar } from "~/components/ePub/PageNavigationBar";
 import fontCss from "~/styles/font.css";
 import { getCurrentEpubChapter } from "~/utils/google.drive.server";
@@ -39,7 +39,7 @@ enum ImagePanelDisplay {
 
 export default function () {
   const html = useLoaderData();
-  const { config: { fontSize, chinseFontFamily, englishFontFamily } } = useRecoilValue(bookConfigState);
+  const [bookConfig, setBookConfig] = useRecoilState(bookConfigState);
   const params = useParams();
   const [highlights, setHighlights] = useRecoilState(highlightState);
   const [colorPanelDisplay, setColorPanelDisplay] = useState(ColorPanelDisplay.off);
@@ -69,6 +69,11 @@ export default function () {
   useEscape(imagePanelRef, () => setImagePanelDisplay(ImagePanelDisplay.off));
 
   useEffect(() => {
+    const { id = '' } = params;
+    if (id !== bookConfig.track.page) {
+      setBookConfig(prev => ({ ...prev, track: { ...prev.track, page: id } }));
+    }
+
     // todo? init from database correctly in future
     setHighlights([]);
   }, [params]);
@@ -110,8 +115,8 @@ export default function () {
         id='book'
         key={key}
         ref={mainRef}
-        className={`${chinseFontFamily} ${englishFontFamily}`}
-        style={{ fontSize }}
+        className={`${bookConfig.config.chinseFontFamily} ${bookConfig.config.englishFontFamily}`}
+        style={{ fontSize: bookConfig.config.fontSize }}
         dangerouslySetInnerHTML={{ __html: html }}
         onDoubleClick={(event) => {
           const target = event.target as HTMLElement;

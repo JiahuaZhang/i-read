@@ -1,6 +1,7 @@
-import { number, object, string } from "@recoiljs/refine";
+import { array, dict, number, object, string } from "@recoiljs/refine";
 import { atom } from "recoil";
 import { syncEffect } from "recoil-sync";
+import { Note } from '../selection/Note';
 
 export type BookConfig = {
   config: {
@@ -9,7 +10,12 @@ export type BookConfig = {
     englishFontFamily: string;
   };
   fileId: string;
-  // currentPage: string;
+  track: {
+    page: string,
+    notes: {
+      [key: string]: Note[];
+    };
+  };
 };
 
 export const defaultBookConfig: BookConfig = {
@@ -18,7 +24,11 @@ export const defaultBookConfig: BookConfig = {
     chinseFontFamily: "",
     englishFontFamily: ""
   },
-  fileId: ""
+  fileId: "",
+  track: {
+    page: '',
+    notes: {}
+  }
 };
 
 export const storeKey = "recoil-sync-indexedDB";
@@ -35,7 +45,16 @@ export const bookConfigState = atom({
           chinseFontFamily: string(),
           englishFontFamily: string()
         }),
-        fileId: string()
+        fileId: string(),
+        track: object({
+          page: string(),
+          notes: dict(array(object({
+            start: number(),
+            created: number(),
+            end: number(),
+            className: string(),
+          })))
+        })
       })
     })
   ]
