@@ -69,16 +69,23 @@ export default function () {
   useEscape(imagePanelRef, () => setImagePanelDisplay(ImagePanelDisplay.off));
 
   useEffect(() => {
-    if (id === bookConfig.track.page) return;
-
-    setBookConfig(prev => ({ ...prev, track: { ...prev.track, page: id } }));
-
     const notes = bookConfig.track.notes[id] ?? [];
-    const cachedHighlights = notes.map(n => isTextNote(n) ? new TextHighlight(n) : new ImageHighlight(n));
-    setHighlights(
-      cachedHighlights.map(h => h.hydrate({ highlighter, doc: document, container: mainRef.current! }))
-    );
-  }, [id]);
+    const restoreNotesFromDB = () => {
+      const cachedHighlights = notes.map(n => isTextNote(n) ? new TextHighlight(n) : new ImageHighlight(n));
+      setHighlights(
+        cachedHighlights.map(h => h.hydrate({ highlighter, doc: document, container: mainRef.current! }))
+      );
+    };
+
+    if (id !== bookConfig.track.page) {
+      setBookConfig(prev => ({ ...prev, track: { ...prev.track, page: id } }));
+      restoreNotesFromDB();
+    } else if (!highlights.length && notes.length) {
+      // sepcial case, on page refresh, restore notes from db
+      restoreNotesFromDB();
+    }
+
+  }, [id, highlights]);
 
   useEffect(() => {
     if (key === 0) return;
