@@ -13,10 +13,10 @@ export const isTextNote = (note: Note): note is TextNote => typeof (note as Text
 
 const colors: { [key in typeof default_highlight_colors[number]]: string } = {
   'bg-amber-400': '#fbbf24',
-  'bg-blue-500': '',
+  'bg-blue-500': '#3b82f6',
   'bg-green-400': '#4ade80',
-  'bg-pink-400': '',
-  'bg-purple-400': '',
+  'bg-pink-400': '#f472b6',
+  'bg-purple-400': '#c084fc',
   'bg-red-600': '#dc2626'
 };
 
