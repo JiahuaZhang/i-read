@@ -35,17 +35,17 @@ export default function () {
 
   const menuItems = [
     {
-      label: <MenuOutlined onClick={() => toggleMenu(SidebarState.Menu)} />,
+      label: <MenuOutlined className='p-4' onClick={() => toggleMenu(SidebarState.Menu)} />,
       key: SidebarState.Menu
     },
     {
       label: (
-        <SettingOutlined onClick={() => toggleMenu(SidebarState.Config)} />
+        <SettingOutlined className='p-4' onClick={() => toggleMenu(SidebarState.Config)} />
       ),
       key: SidebarState.Config
     },
     {
-      label: <ProfileOutlined onClick={() => toggleMenu(SidebarState.Note)} />,
+      label: <ProfileOutlined className='p-4' onClick={() => toggleMenu(SidebarState.Note)} />,
       key: SidebarState.Note
     }
   ];

@@ -28,13 +28,13 @@ export const loader: LoaderFunction = async ({ params }) => {
 export const default_highlight_colors = ['bg-red-600', 'bg-amber-400', 'bg-green-400', 'bg-blue-500', 'bg-purple-400', 'bg-pink-400'] as const;
 
 enum ColorPanelDisplay {
-  on = 'inline-grid',
-  off = 'none'
+  on = 'visible',
+  off = 'hidden'
 }
 
 enum ImagePanelDisplay {
-  on = '',
-  off = 'none'
+  on = 'visible',
+  off = 'hidden'
 }
 
 export default function () {
@@ -122,7 +122,7 @@ export default function () {
         id='book'
         key={key}
         ref={mainRef}
-        className={`${bookConfig.config.chinseFontFamily} ${bookConfig.config.englishFontFamily}`}
+        className={`${bookConfig.config.chinseFontFamily} ${bookConfig.config.englishFontFamily} p-4`}
         style={{ fontSize: bookConfig.config.fontSize }}
         dangerouslySetInnerHTML={{ __html: html }}
         onDoubleClick={(event) => {
@@ -173,7 +173,7 @@ export default function () {
       <div
         ref={colorPanelRef}
         className="absolute inline-grid grid-flow-col gap-2 rounded bg-orange-50 p-2 items-center"
-        style={{ ...position, display: colorPanelDisplay }}
+        style={{ ...position, visibility: colorPanelDisplay }}
         onMouseDown={event => event.preventDefault()}
       >
         {default_highlight_colors.map((color) => (
@@ -227,7 +227,7 @@ export default function () {
 
       <Checkbox
         className='absolute p-2 bg-slate-50 rounded border-2 border-violet-600'
-        style={{ ...position, display: imagePanelDisplay }}
+        style={{ ...position, visibility: imagePanelDisplay }}
         ref={r => {
           if (!r) return;
           imagePanelRef.current = (r as any).input; // eslint-disable-line
