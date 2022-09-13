@@ -20,8 +20,10 @@ declare global {
 }
 
 if (!global.google) {
+  const index = process.env.NODE_ENV === 'production' ? 1 : 0;
+
   global.google = {
-    oauth2Client: new google.auth.OAuth2(keys.web.client_id, keys.web.client_secret, keys.web.redirect_uris[0])
+    oauth2Client: new google.auth.OAuth2(keys.web.client_id, keys.web.client_secret, keys.web.redirect_uris[index])
   };
 }
 
