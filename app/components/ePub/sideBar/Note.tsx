@@ -39,33 +39,34 @@ export const Note = () => {
   const ref = useRef(null);
   useEscape(ref, () => setConfirmDelte(false));
 
-  return <div>
-    <div className='text-3xl inline-grid grid-flow-col justify-between w-full p-2'>
-      <CopyFilled
-        onClick={async () => {
-          const contents = highlights.map(h => h.toElements()).flat();
-          const type = 'text/html';
-          navigator.clipboard.write([
-            new ClipboardItem({ [type]: new Blob(contents, { type }) })
-          ]);
-          notification.success({ message: 'copied!', duration: 1.5 });
-        }}
-        className='text-blue-400 cursor-pointer hover:text-blue-800' />
+  return (
+    <div>
+      <div className='text-3xl inline-grid grid-flow-col justify-between w-full p-2 sticky top-0 bg-white'>
+        <CopyFilled
+          onClick={async () => {
+            const contents = highlights.map(h => h.toElements()).flat();
+            const type = 'text/html';
+            navigator.clipboard.write([
+              new ClipboardItem({ [type]: new Blob(contents, { type }) })
+            ]);
+            notification.success({ message: 'copied!', duration: 1.5 });
+          }}
+          className='text-blue-400 cursor-pointer hover:text-blue-800' />
 
-      {!confirmDelte
-        && <DeleteFilled
-          onClick={(event) => { event.nativeEvent.stopImmediatePropagation(); setConfirmDelte(true); }}
-          className='text-orange-400 cursor-pointer hover:text-orange-800' />}
+        {!confirmDelte
+          && <DeleteFilled
+            onClick={(event) => { event.nativeEvent.stopImmediatePropagation(); setConfirmDelte(true); }}
+            className='text-orange-400 cursor-pointer hover:text-orange-800' />}
 
-      {confirmDelte
-        && <span className='inline-grid items-center grid-flow-col'>
-          <span className='text-base text-rose-800' >Confirm Delete</span>
-          <DeleteFilled
-            ref={ref}
-            onClick={() => { setHighlights([]); setMainKey(k => k + 1); setConfirmDelte(false); }}
-            className='text-rose-400 cursor-pointer hover:text-rose-800' />
-        </span>}
-    </div>
-    <ul>{highlights.map(renderHighlight)}</ul>
-  </div>;
+        {confirmDelte
+          && <span className='inline-grid items-center grid-flow-col'>
+            <span className='text-base text-rose-800' >Confirm Delete</span>
+            <DeleteFilled
+              ref={ref}
+              onClick={() => { setHighlights([]); setMainKey(k => k + 1); setConfirmDelte(false); }}
+              className='text-rose-400 cursor-pointer hover:text-rose-800' />
+          </span>}
+      </div>
+      <ul>{highlights.map(renderHighlight)}</ul>
+    </div>);
 };
