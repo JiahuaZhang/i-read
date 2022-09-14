@@ -2,6 +2,7 @@ import { CloseCircleFilled, DeleteFilled } from '@ant-design/icons';
 import { MetaFunction, type LinksFunction, type LoaderFunction } from "@remix-run/node";
 import { useLoaderData, useParams } from "@remix-run/react";
 import { Checkbox, Modal, notification } from 'antd';
+import { cloneDeep } from 'lodash';
 import rangy from 'rangy';
 import 'rangy/lib/rangy-classapplier';
 import 'rangy/lib/rangy-highlighter';
@@ -42,6 +43,7 @@ export default function () {
   const [bookConfig, setBookConfig] = useRecoilState(bookConfigState);
   const { id = '' } = useParams();
   const [highlights, setHighlights] = useRecoilState(highlightState);
+  const [needInitHighlights, setNeedInitHighlights] = useState(true);
   const [colorPanelDisplay, setColorPanelDisplay] = useState(ColorPanelDisplay.off);
   const [imagePanelDisplay, setImagePanelDisplay] = useState(ImagePanelDisplay.off);
   const [recentImage, setRecentImage] = useState<ImageHighlight>();
@@ -69,23 +71,21 @@ export default function () {
   useEscape(imagePanelRef, () => setImagePanelDisplay(ImagePanelDisplay.off));
 
   useEffect(() => {
-    const notes = bookConfig.track.notes[id] ?? [];
-    const restoreNotesFromDB = () => {
-      const cachedHighlights = notes.map(n => isTextNote(n) ? new TextHighlight(n) : new ImageHighlight(n));
-      setHighlights(
-        cachedHighlights.map(h => h.hydrate({ highlighter, doc: document, container: mainRef.current! }))
-      );
-    };
-
     if (id !== bookConfig.track.page) {
+      setNeedInitHighlights(true);
       setBookConfig(prev => ({ ...prev, track: { ...prev.track, page: id } }));
-      restoreNotesFromDB();
-    } else if (!highlights.length && notes.length) {
-      // sepcial case, on page refresh, restore notes from db
-      restoreNotesFromDB();
     }
+  }, [id]);
 
-  }, [id, highlights]);
+  useEffect(() => {
+    const notes = bookConfig.track.notes[id] ?? [];
+    const cachedHighlights = notes.map(n => isTextNote(n) ? new TextHighlight(n) : new ImageHighlight(n));
+    setHighlights(
+      cachedHighlights.map(h => h.hydrate({ highlighter, doc: document, container: mainRef.current! }))
+    );
+
+    setNeedInitHighlights(false);
+  }, [needInitHighlights]);
 
   useEffect(() => {
     if (key === 0) return;
@@ -94,9 +94,20 @@ export default function () {
   }, [key]);
 
   useEffect(() => {
+    if (needInitHighlights) return;
+
     const notes = highlights.map(h => h.note);
-    setBookConfig(prev => ({ ...prev, track: { ...prev.track, notes: { ...prev.track.notes, [id]: notes } } }));
-  }, [highlights]);
+    setBookConfig(value => {
+      const newValue = cloneDeep(value);
+      if (!notes.length) {
+        delete newValue.track.notes[id];
+        return newValue;
+      }
+
+      newValue.track.notes[id] = notes;
+      return newValue;
+    });
+  }, [highlights, needInitHighlights]);
 
   const getPosition = useCallback(
     (panel: HTMLElement, event: MouseEvent) => {
@@ -143,7 +154,7 @@ export default function () {
           ]);
           notification.success({ message: 'Image copied', duration: 1.5 });
         }}
-        onClick={(event) => {
+        onClick={async (event) => {
           if (colorPanelDisplay === ColorPanelDisplay.on) return;
 
           const target = event.target as HTMLElement;
@@ -168,6 +179,7 @@ export default function () {
             setHighlightIndex(index);
             const current = highlights[index];
             current.toggleSelect({ highlighter, doc: document, container: mainRef.current! });
+            await Promise.resolve();
           }
 
           event.nativeEvent.stopImmediatePropagation();
@@ -224,7 +236,6 @@ export default function () {
         {highlightIndex !== -1 &&
           <DeleteFilled className='text-fill text-red-600 ml-4 text-xl inline-grid cursor-pointer'
             onClick={() => {
-              console.log('to delete');
               setHighlights(prev => prev.filter((_, index) => index !== highlightIndex));
               setColorPanelDisplay(ColorPanelDisplay.off);
               setKey(value => value + 1);
