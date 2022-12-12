@@ -7,9 +7,8 @@ import {
   Scripts,
   ScrollRestoration
 } from "@remix-run/react";
-import { RecoilRoot } from "recoil";
-
 import antdCss from "antd/dist/antd.css";
+import { RecoilRoot } from "recoil";
 import tailwindStylesheetUrl from "./styles/tailwind.css";
 
 export const links: LinksFunction = () => {

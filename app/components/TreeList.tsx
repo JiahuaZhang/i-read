@@ -1,54 +1,12 @@
 import { Input } from 'antd';
 import produce from 'immer';
-import { uniqueId } from 'lodash';
-import React, { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
 import { useEscape } from '~/utils/hook/useEscape';
+import { Tree, treeMindMapState, treeMindMapTabIndexState, updateTrees } from '~/utils/state/tree-mind-map';
 
 // super challenge
 // enable ctrl z & ctrl y
-
-type Tree = {
-  id: string;
-  value: string;
-  children?: Tree[];
-};
-
-const dummyData: Tree[] = [
-  {
-    id: uniqueId(),
-    value: '   ',
-    // value: 'first title',
-    children: [
-      { id: uniqueId(), value: 'first child' },
-      { id: uniqueId(), value: 'second child' },
-    ]
-  },
-  {
-    id: uniqueId(),
-    value: 'second title',
-  },
-  {
-    id: uniqueId(),
-    value: 'another title',
-    children: [
-      {
-        id: uniqueId(),
-        // value: 'hello child'
-        value: ''
-      },
-      { id: uniqueId(), value: 'hello again child' },
-    ]
-  }
-];
-
-const updateTrees = (items: Tree[], paths: number[], value: string) => {
-  const [index, ...rest] = paths;
-  if (rest.length === 0) {
-    items[index].value = value;
-  } else {
-    updateTrees(items[index].children || [], rest, value);
-  }
-};
 
 // https://react-spectrum.adobe.com/react-aria/useDrag.html
 // https://github.com/immerjs/immer
@@ -65,13 +23,21 @@ const inputParentClass = `${inputCornerVerticalLine} ${inputCornerHorizontalLine
 type TreeFn = {
   tree: Tree,
   path: string,
-  updater: React.Dispatch<React.SetStateAction<Tree[]>>;
 };
-const renderTree = ({ tree, path, updater }: TreeFn) => {
+const renderTree = ({ tree, path }: TreeFn) => {
+  const updater = useSetRecoilState(treeMindMapState);
+  const [tabIndex, setTabIndex] = useRecoilState(treeMindMapTabIndexState);
   const [isUpdating, setIsUpdating] = useState(false);
   const [value, setValue] = useState(tree.value);
   const inputRef = useRef<HTMLInputElement | null>(null);
+  const spanRef = useRef<HTMLSpanElement>(null);
   useEscape(inputRef, () => setIsUpdating(false));
+
+  useEffect(() => {
+    if (tabIndex === tree.id) {
+      spanRef.current?.focus();
+    }
+  }, [tabIndex, tree.id, spanRef]);
 
   return <li key={tree.id} className={liClass} >
     {isUpdating && <span className={`${tree.children && inputParentClass} `} >
@@ -86,29 +52,52 @@ const renderTree = ({ tree, path, updater }: TreeFn) => {
             updateTrees(draft, keys, value);
           }));
 
-          if (event.key === 'Enter') setIsUpdating(false);
+          if (event.key === 'Enter') {
+            setIsUpdating(false);
+            setTimeout(() => spanRef.current?.focus(), 0);
+          }
         }}
       />
     </span>}
 
-    {!isUpdating && <span className={`${tree.children && parentClass}`} onDoubleClick={() => setIsUpdating(true)} >
+    {/* todo, click to change to toggle */}
+
+    {!isUpdating && <span
+      ref={spanRef}
+      className={`${tree.children && parentClass} focus-visible:outline-2 focus-visible:outline-blue-200 focus:border-2 focus:border-blue-200`}
+      tabIndex={tabIndex === tree.id ? 1 : 0}
+      onClick={() => setTabIndex(tree.id)}
+      onDoubleClick={() => setIsUpdating(true)}
+      onKeyDown={e => {
+        if (e.key === 'Enter') {
+          return setIsUpdating(true);
+        }
+
+        if (['ArrowRight', 'ArrowDown'].includes(e.key)) {
+          return setTabIndex(i => `${Number(i) + 1}`);
+        }
+        if (['ArrowUp', 'ArrowLeft'].includes(e.key)) {
+          return setTabIndex(i => `${Number(i) - 1}`);
+        }
+      }}
+    >
       {!isUpdating && tree.value.replace(/\s+/, '') ? tree.value : <span className='italic text-gray-400 text-2xl' >double click to edit</span>}
     </span>}
 
     {tree.children &&
       <ul>
-        {tree.children.map((c, i) => renderTree({ tree: c, path: `${path}.${i}`, updater }))}
+        {tree.children.map((c, i) => renderTree({ tree: c, path: `${path}.${i}` }))}
       </ul>}
   </li>;
 };
 
 export const TreeList = () => {
-  const [data, setData] = useState(dummyData);
+  const data = useRecoilValue(treeMindMapState);
 
   // todo, make list item toggleable
   // from parent, to kid, to next kid
   // and can back to parent shift tap
   return <ul className='p-2 border-2 border-green-200 text-3xl' >
-    {data.map((d, i) => renderTree({ tree: d, path: `${i}`, updater: setData }))}
+    {data.map((d, i) => renderTree({ tree: d, path: `${i}` }))}
   </ul>;
 };
