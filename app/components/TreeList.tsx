@@ -3,7 +3,7 @@ import produce from 'immer';
 import { useEffect, useRef, useState } from 'react';
 import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
 import { useEscape } from '~/utils/hook/useEscape';
-import { Tree, treeMindMapState, treeMindMapTabIndexState, updateTrees } from '~/utils/state/tree-mind-map';
+import { getAdjacentId, Tree, treeMindMapState, treeMindMapTabIndexState, updateTrees } from '~/utils/state/tree-mind-map';
 
 // super challenge
 // enable ctrl z & ctrl y
@@ -25,6 +25,7 @@ type TreeFn = {
   path: string,
 };
 const renderTree = ({ tree, path }: TreeFn) => {
+  const treeMindMaps = useRecoilValue(treeMindMapState);
   const updater = useSetRecoilState(treeMindMapState);
   const [tabIndex, setTabIndex] = useRecoilState(treeMindMapTabIndexState);
   const [isUpdating, setIsUpdating] = useState(false);
@@ -32,6 +33,8 @@ const renderTree = ({ tree, path }: TreeFn) => {
   const inputRef = useRef<HTMLInputElement | null>(null);
   const spanRef = useRef<HTMLSpanElement>(null);
   useEscape(inputRef, () => setIsUpdating(false));
+
+  const keys = path.split('.').map(Number);
 
   useEffect(() => {
     if (tabIndex === tree.id) {
@@ -48,7 +51,6 @@ const renderTree = ({ tree, path }: TreeFn) => {
         onChange={(event) => setValue(event.target.value)}
         onKeyDown={event => {
           updater(produce(draft => {
-            const keys = path.split('.').map(Number);
             updateTrees(draft, keys, value);
           }));
 
@@ -73,12 +75,19 @@ const renderTree = ({ tree, path }: TreeFn) => {
           return setIsUpdating(true);
         }
 
-        if (['ArrowRight', 'ArrowDown'].includes(e.key)) {
-          return setTabIndex(i => `${Number(i) + 1}`);
+        if (e.key === 'ArrowDown') {
+          return setTabIndex(
+            getAdjacentId(treeMindMaps, keys, 'down')
+          );
         }
-        if (['ArrowUp', 'ArrowLeft'].includes(e.key)) {
-          return setTabIndex(i => `${Number(i) - 1}`);
+
+        if (e.key === 'ArrowUp') {
+          return setTabIndex(
+            getAdjacentId(treeMindMaps, keys, 'up')
+          );
         }
+
+        // todo, left, right arrows
       }}
     >
       {!isUpdating && tree.value.replace(/\s+/, '') ? tree.value : <span className='italic text-gray-400 text-2xl' >double click to edit</span>}
