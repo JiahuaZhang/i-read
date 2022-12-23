@@ -3,7 +3,7 @@ import { Tree, trimTrees } from './tree-mind-map';
 
 describe('simple same level cases', () => {
   it('1 size case', () => {
-    const data: Tree[] = [{ id: '0', value: '' }];
+    const data: Tree[] = [{ id: '0', value: '', children: [] }];
     const { items, tabIndex } = trimTrees(data, [0]);
     const answer: Tree[] = [];
 
@@ -13,11 +13,11 @@ describe('simple same level cases', () => {
 
   it('first case', () => {
     const data: Tree[] = [
-      { id: '0', value: '' },
-      { id: '1', value: '' },
-      { id: '2', value: '' },
-      { id: '3', value: '' },
-      { id: '4', value: '' },
+      { id: '0', value: '', children: [] },
+      { id: '1', value: '', children: [] },
+      { id: '2', value: '', children: [] },
+      { id: '3', value: '', children: [] },
+      { id: '4', value: '', children: [] },
     ];
     const { items, tabIndex } = trimTrees(data, [0]);
     const [_, ...answer] = data;
@@ -28,11 +28,11 @@ describe('simple same level cases', () => {
 
   it('last case', () => {
     const data: Tree[] = [
-      { id: '0', value: '' },
-      { id: '1', value: '' },
-      { id: '2', value: '' },
-      { id: '3', value: '' },
-      { id: '4', value: '' },
+      { id: '0', value: '', children: [] },
+      { id: '1', value: '', children: [] },
+      { id: '2', value: '', children: [] },
+      { id: '3', value: '', children: [] },
+      { id: '4', value: '', children: [] },
     ];
     const { items, tabIndex } = trimTrees(data, [4]);
     const answer = data.slice(0, 4);
@@ -43,11 +43,11 @@ describe('simple same level cases', () => {
 
   it.only('regular case', () => {
     const data: Tree[] = [
-      { id: '0', value: '' },
-      { id: '1', value: '' },
-      { id: '2', value: '' },
-      { id: '3', value: '' },
-      { id: '4', value: '' },
+      { id: '0', value: '', children: [] },
+      { id: '1', value: '', children: [] },
+      { id: '2', value: '', children: [] },
+      { id: '3', value: '', children: [] },
+      { id: '4', value: '', children: [] },
     ];
     const { items, tabIndex } = trimTrees(data, [2]);
     const answer = [...data.slice(0, 2), ...data.slice(3)];
@@ -62,7 +62,7 @@ describe('nested cases', () => {
     const data: Tree[] = [
       {
         id: '0', value: '', children: [
-          { id: '00', value: '' }
+          { id: '00', value: '', children: [] }
         ]
       }
     ];
