@@ -1,11 +1,7 @@
 import { uniqueId } from 'lodash';
 import { atom } from 'recoil';
 
-export type Tree = {
-  id: string;
-  value: string;
-  children?: Tree[];
-};
+export type Tree = { id: string; value: string; children?: Tree[]; };
 
 export const updateTrees = (items: Tree[], paths: number[], value: string) => {
   const [index, ...rest] = paths;
@@ -16,9 +12,7 @@ export const updateTrees = (items: Tree[], paths: number[], value: string) => {
   }
 };
 
-type TreeMeta = Tree & {
-  path: number;
-};
+type TreeMeta = Tree & { path: number; };
 
 // future? option, right? left?
 // paths -> should be at least size of 1
@@ -61,6 +55,36 @@ export const getAdjacentId = (items: Tree[], paths: number[], option: 'up' | 'do
   }
 
   return meta[0].id;
+};
+
+export const trimTrees = (items: Tree[], paths: number[]) => {
+  if (paths.length === 1) {
+    items = items.filter((_, index) => index !== paths[0]);
+
+    if (items.length === 0) return { items, tabIndex: 'NOT EXISTED' };
+
+    if (items.length - 1 >= paths[0]) {
+      return { items, tabIndex: items[paths[0]].id };
+    }
+
+    return { items, tabIndex: items[paths[0] - 1].id };
+  }
+
+  let part = items[paths[0]];
+  for (let index = 1; index < paths.length - 2; index++) {
+    part = part.children![paths[index]];
+  }
+
+  part.children = part.children?.filter((_, index) => index !== paths.at(-1));
+  if (part.children?.length === 0) {
+    return { items, tabIndex: part.id };
+  }
+
+  if (part.children!.length - 1 >= paths.at(-1)!) {
+    return { items, tabIndex: part.children![paths.at(-1)!].id };
+  }
+
+  return { items, tabIndex: part.children![paths.at(-1)! - 1].id };
 };
 
 const dummyData: Tree[] = [
