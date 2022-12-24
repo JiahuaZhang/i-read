@@ -3,7 +3,6 @@ import { atom } from 'recoil';
 
 export type Tree = { id: string; value: string; children: Tree[]; };
 
-// todo, add unit test for it
 export const updateTrees = (items: Tree[], paths: number[], value: string) => {
   const [index, ...rest] = paths;
   if (rest.length === 0) {
