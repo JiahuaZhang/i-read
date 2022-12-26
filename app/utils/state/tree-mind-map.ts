@@ -1,7 +1,9 @@
-import { uniqueId } from 'lodash';
+import { toPath, uniqueId } from 'lodash';
 import { atom } from 'recoil';
 
 export type Tree = { id: string; value: string; children: Tree[]; };
+
+export const toNumberPath = (path: string) => toPath(path).map(Number);
 
 export const updateTrees = (items: Tree[], paths: number[], value: string) => {
   const [index, ...rest] = paths;
@@ -71,7 +73,7 @@ export const trimTrees = (items: Tree[], paths: number[]) => {
   }
 
   let part = items[paths[0]];
-  for (let index = 1; index < paths.length - 2; index++) {
+  for (let index = 1; index < paths.length - 1; index++) {
     part = part.children[paths[index]];
   }
 
