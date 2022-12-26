@@ -71,6 +71,15 @@ const renderTree = ({ tree, path }: TreeFn) => {
       onClick={() => setTabIndex(tree.id)}
       onDoubleClick={() => setIsUpdating(true)}
       onKeyDown={e => {
+        if (e.key === 'Tab') {
+          e.preventDefault();
+        }
+
+        if (['Backspace', 'Delete'].includes(e.key)) {
+          // todo, delete case
+          console.log('delete case!');
+        }
+
         if (e.key === 'Enter') {
           return setIsUpdating(true);
         }
