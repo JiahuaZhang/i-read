@@ -6,7 +6,7 @@ import { useMatchesData } from "~/utils";
 const getAdjacentFlow = (id: string, flows: EPub.TocElement[]) => {
   const index = flows.findIndex((flow) => flow.id === id);
   const hasFront = index > 0;
-  const hasNext = index < flows.length;
+  const hasNext = index + 1 < flows.length;
   return [
     hasFront ? flows[index - 1].id : null,
     hasNext ? flows[index + 1].id : null,
