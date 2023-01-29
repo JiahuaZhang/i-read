@@ -1,4 +1,4 @@
-import { MenuOutlined, ProfileOutlined, SettingOutlined } from "@ant-design/icons";
+import { EditOutlined, MenuOutlined, ProfileOutlined, SettingOutlined } from "@ant-design/icons";
 import { type LoaderFunction } from "@remix-run/node";
 import { Outlet } from "@remix-run/react";
 import { Menu } from "antd";
@@ -17,19 +17,30 @@ export const loader: LoaderFunction = async ({ params }) => {
 };
 
 enum SidebarState {
-  Off = "Off",
   Menu = "Menu",
   Config = "Config",
-  Note = "Note"
+  Note = "Note",
+  MindMap = "MindMap",
 }
+const leftGroup = [SidebarState.Menu, SidebarState.Config, SidebarState.Note];
+const rightGroup = [SidebarState.MindMap];
+
+const containsLeftSidebar = (states: SidebarState[]) => states.some(state => leftGroup.includes(state));
+const containsRightSidebar = (states: SidebarState[]) => states.some(state => rightGroup.includes(state));
+const isSameGroup = (a: SidebarState, b: SidebarState) =>
+  (leftGroup.includes(a) && leftGroup.includes(b)) || (rightGroup.includes(a) && rightGroup.includes(b));
 
 export default function () {
-  const [sidebarState, setSidebarState] = useState(SidebarState.Off);
+  const [sidebarState, setSidebarState] = useState<SidebarState[]>([]);
   const { width, mount, unmount } = useResize();
 
   const toggleMenu = useCallback(
     (state: SidebarState) =>
-      setSidebarState((prev) => (prev === state ? SidebarState.Off : state)),
+      setSidebarState((prev) => {
+        if (prev.includes(state)) return prev.filter(p => p !== state);
+
+        return [...prev.filter(p => !isSameGroup(p, state)), state];
+      }),
     [setSidebarState]
   );
 
@@ -47,7 +58,11 @@ export default function () {
     {
       label: <ProfileOutlined className='p-4' onClick={() => toggleMenu(SidebarState.Note)} />,
       key: SidebarState.Note
-    }
+    },
+    {
+      label: <EditOutlined className='p-4' onClick={() => toggleMenu(SidebarState.MindMap)} />,
+      key: SidebarState.MindMap
+    },
   ];
 
   return (
@@ -55,30 +70,36 @@ export default function () {
       <div className="grid h-screen w-screen" style={{ gridTemplateRows: 'max-content 1fr' }}>
         <Menu
           mode="horizontal"
-          selectedKeys={[sidebarState]}
+          selectedKeys={sidebarState}
           items={menuItems}
-          className='[&>li]:leading-10'
+          className='[&>li:nth-last-child(2)]:ml-auto'
         />
         <section
           className="inline-grid min-h-0 h-full w-full min-w-0"
-          style={{ gridTemplateColumns: "max-content max-content 1fr" }}
+          style={{ gridTemplateColumns: "max-content max-content 1fr max-content max-content" }}
         >
           <aside
             className="overflow-y-auto"
-            style={{ width: sidebarState === SidebarState.Off ? 0 : width }}
+            style={{ width: !containsLeftSidebar(sidebarState) ? 0 : width }}
           >
-            {sidebarState === SidebarState.Menu && <TableOfContent />}
-            {sidebarState === SidebarState.Config && <ConfigPanel />}
-            {sidebarState === SidebarState.Note && <Note />}
+            {sidebarState.includes(SidebarState.Menu) && <TableOfContent />}
+            {sidebarState.includes(SidebarState.Config) && <ConfigPanel />}
+            {sidebarState.includes(SidebarState.Note) && <Note />}
           </aside>
           <div
-            className={`${sidebarState === SidebarState.Off ? "w-0" : "w-[6px]"} cursor-ew-resize bg-gray-200`}
+            className={`${!containsLeftSidebar(sidebarState) ? "w-0" : "w-[6px]"} cursor-ew-resize bg-gray-200`}
             onMouseDown={mount}
             onMouseUp={unmount}
           />
-          <main className="min-h-0 h-full min-w-0 w-full">
+          <main className="min-h-0 h-full min-w-0">
             <Outlet />
           </main>
+          <div className={`${!containsRightSidebar(sidebarState) ? 'w-0' : 'w-[6px]'} cursor-ew-resize bg-gray-200`} />
+          <aside className='overflow-y-auto' style={{ width: !containsRightSidebar(sidebarState) ? 0 : 125 }} >
+            <div>
+              my editor place holder
+            </div>
+          </aside>
         </section>
       </div>
     </RecoilSyncIndexedDB>
