@@ -30,9 +30,16 @@ const containsRightSidebar = (states: SidebarState[]) => states.some(state => ri
 const isSameGroup = (a: SidebarState, b: SidebarState) =>
   (leftGroup.includes(a) && leftGroup.includes(b)) || (rightGroup.includes(a) && rightGroup.includes(b));
 
+const rightResize = (event: MouseEvent) => {
+  const bookSection = document.querySelector('#book-section')!;
+  const DRAG_BAR_WIDTH = 6;
+  return (bookSection.clientWidth) - event.clientX - DRAG_BAR_WIDTH;
+};
+
 export default function () {
   const [sidebarState, setSidebarState] = useState<SidebarState[]>([]);
-  const { width, mount, unmount } = useResize();
+  const { width: leftWidth, mount: leftMount, unmount: leftUnmount } = useResize();
+  const { width: rightWidth, mount: rightMount, unmount: rightUnmount } = useResize({ resize: rightResize });
 
   const toggleMenu = useCallback(
     (state: SidebarState) =>
@@ -75,12 +82,13 @@ export default function () {
           className='[&>li:nth-last-child(2)]:ml-auto'
         />
         <section
+          id='book-section'
           className="inline-grid min-h-0 h-full w-full min-w-0"
           style={{ gridTemplateColumns: "max-content max-content 1fr max-content max-content" }}
         >
           <aside
             className="overflow-y-auto"
-            style={{ width: !containsLeftSidebar(sidebarState) ? 0 : width }}
+            style={{ width: !containsLeftSidebar(sidebarState) ? 0 : leftWidth }}
           >
             {sidebarState.includes(SidebarState.Menu) && <TableOfContent />}
             {sidebarState.includes(SidebarState.Config) && <ConfigPanel />}
@@ -88,14 +96,18 @@ export default function () {
           </aside>
           <div
             className={`${!containsLeftSidebar(sidebarState) ? "w-0" : "w-[6px]"} cursor-ew-resize bg-gray-200`}
-            onMouseDown={mount}
-            onMouseUp={unmount}
+            onMouseDown={leftMount}
+            onMouseUp={leftUnmount}
           />
           <main className="min-h-0 h-full min-w-0">
             <Outlet />
           </main>
-          <div className={`${!containsRightSidebar(sidebarState) ? 'w-0' : 'w-[6px]'} cursor-ew-resize bg-gray-200`} />
-          <aside className='overflow-y-auto' style={{ width: !containsRightSidebar(sidebarState) ? 0 : 125 }} >
+          <div
+            className={`${!containsRightSidebar(sidebarState) ? 'w-0' : 'w-[6px]'} cursor-ew-resize bg-gray-200`}
+            onMouseDown={rightMount}
+            onMouseUp={rightUnmount}
+          />
+          <aside className='overflow-y-auto' style={{ width: !containsRightSidebar(sidebarState) ? 0 : rightWidth }} >
             <div>
               my editor place holder
             </div>
