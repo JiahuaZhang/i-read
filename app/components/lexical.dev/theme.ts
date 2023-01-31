@@ -7,7 +7,7 @@ const cornerVerticalLine = '[&>ul]:after:absolute [&>ul]:after:bg-blue-200 [&>ul
 
 export const theme: InitialConfigType["theme"] = {
   list: {
-    ul: "p-2 text-[2rem] leading-10",
+    ul: "p-2 text-[1.75rem] leading-10 font-方正楷体",
     listitem: `${listItemDot} ${listVerticalLine} ${cornerHorizontalLine} ${cornerVerticalLine}`,
   },
 };

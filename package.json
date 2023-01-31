@@ -26,7 +26,8 @@
     "test:e2e:run": "cross-env PORT=8811 start-server-and-test start:mocks http://localhost:8811 \"cypress run\"",
     "typecheck": "tsc -b && tsc -b cypress",
     "validate": "run-p \"test -- --run\" lint typecheck test:e2e:run",
-    "fly:secret:set": "flyctl.exe secrets set SESSION_SECRET=SESSION_SECRET"
+    "fly:secret:set": "flyctl.exe secrets set SESSION_SECRET=SESSION_SECRET",
+    "fly:deploy": "flyctl.exe deploy"
   },
   "prettier": {},
   "eslintIgnore": [

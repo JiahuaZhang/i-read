@@ -40,7 +40,7 @@ const rightResize = (event: MouseEvent) => {
 export default function () {
   const [sidebarState, setSidebarState] = useState<SidebarState[]>([]);
   const { width: leftWidth, mount: leftMount, unmount: leftUnmount } = useResize();
-  const { width: rightWidth, mount: rightMount, unmount: rightUnmount } = useResize({ resize: rightResize });
+  const { width: rightWidth, mount: rightMount, unmount: rightUnmount } = useResize({ initWidth: 600, resize: rightResize });
 
   const toggleMenu = useCallback(
     (state: SidebarState) =>
