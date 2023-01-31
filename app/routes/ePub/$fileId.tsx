@@ -6,6 +6,7 @@ import { useCallback, useState } from "react";
 import { ConfigPanel } from "~/components/ePub/sideBar/configPanel/ConfigPanel";
 import { Note } from '~/components/ePub/sideBar/Note';
 import TableOfContent from "~/components/ePub/sideBar/TableOfContent";
+import { Editor } from '~/components/lexical.dev/Editor';
 import { RecoilSyncIndexedDB } from "~/components/recoil/RecoilSyncIndexedDB";
 import { getEPub } from "~/utils/google.drive.server";
 import { useResize } from "~/utils/hook/useResize";
@@ -81,6 +82,7 @@ export default function () {
           items={menuItems}
           className='[&>li:nth-last-child(2)]:ml-auto'
         />
+
         <section
           id='book-section'
           className="inline-grid min-h-0 h-full w-full min-w-0"
@@ -107,10 +109,15 @@ export default function () {
             onMouseDown={rightMount}
             onMouseUp={rightUnmount}
           />
-          <aside className='overflow-y-auto' style={{ width: !containsRightSidebar(sidebarState) ? 0 : rightWidth }} >
-            <div>
-              my editor place holder
-            </div>
+          <aside
+            className='overflow-y-auto' style={{ width: !containsRightSidebar(sidebarState) ? 0 : rightWidth }}
+            onKeyUp={e => {
+              if (['ArrowRight', 'ArrowLeft'].includes(e.key)) {
+                e.nativeEvent.stopImmediatePropagation();
+              }
+            }}
+          >
+            <Editor />
           </aside>
         </section>
       </div>
