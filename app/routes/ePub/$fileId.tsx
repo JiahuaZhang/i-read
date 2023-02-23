@@ -18,18 +18,17 @@ export const loader: LoaderFunction = async ({ params }) => {
 };
 
 enum SidebarState {
-  Menu = "Menu",
-  Config = "Config",
-  Note = "Note",
-  MindMap = "MindMap",
+  Off = 'off',
+  Menu = 'menu',
+  Config = 'config',
+  Note = 'note',
+  MindMap = 'mindMap',
 }
 const leftGroup = [SidebarState.Menu, SidebarState.Config, SidebarState.Note];
 const rightGroup = [SidebarState.MindMap];
 
 const containsLeftSidebar = (states: SidebarState[]) => states.some(state => leftGroup.includes(state));
 const containsRightSidebar = (states: SidebarState[]) => states.some(state => rightGroup.includes(state));
-const isSameGroup = (a: SidebarState, b: SidebarState) =>
-  (leftGroup.includes(a) && leftGroup.includes(b)) || (rightGroup.includes(a) && rightGroup.includes(b));
 
 const rightResize = (event: MouseEvent) => {
   const bookSection = document.querySelector('#book-section')!;
@@ -38,17 +37,12 @@ const rightResize = (event: MouseEvent) => {
 };
 
 export default function () {
-  const [sidebarState, setSidebarState] = useState<SidebarState[]>([]);
+  const [sidebarState, setSidebarState] = useState(SidebarState.Off);
   const { width: leftWidth, mount: leftMount, unmount: leftUnmount } = useResize();
   const { width: rightWidth, mount: rightMount, unmount: rightUnmount } = useResize({ initWidth: 600, resize: rightResize });
 
   const toggleMenu = useCallback(
-    (state: SidebarState) =>
-      setSidebarState((prev) => {
-        if (prev.includes(state)) return prev.filter(p => p !== state);
-
-        return [...prev.filter(p => !isSameGroup(p, state)), state];
-      }),
+    (state: SidebarState) => setSidebarState(prev => prev === state ? SidebarState.Off : state),
     [setSidebarState]
   );
 
@@ -78,7 +72,7 @@ export default function () {
       <div className="grid h-screen w-screen" style={{ gridTemplateRows: 'max-content 1fr' }}>
         <Menu
           mode="horizontal"
-          selectedKeys={sidebarState}
+          selectedKeys={[sidebarState]}
           items={menuItems}
           className='[&>li:nth-last-child(2)]:ml-auto'
         />
@@ -90,14 +84,14 @@ export default function () {
         >
           <aside
             className="overflow-y-auto"
-            style={{ width: !containsLeftSidebar(sidebarState) ? 0 : leftWidth }}
+            style={{ width: !containsLeftSidebar([sidebarState]) ? 0 : leftWidth }}
           >
             {sidebarState.includes(SidebarState.Menu) && <TableOfContent />}
             {sidebarState.includes(SidebarState.Config) && <ConfigPanel />}
             {sidebarState.includes(SidebarState.Note) && <Note />}
           </aside>
           <div
-            className={`${!containsLeftSidebar(sidebarState) ? "w-0" : "w-[6px]"} cursor-ew-resize bg-gray-200`}
+            className={`${!containsLeftSidebar([sidebarState]) ? "w-0" : "w-[6px]"} cursor-ew-resize bg-gray-200`}
             onMouseDown={leftMount}
             onMouseUp={leftUnmount}
           />
@@ -105,12 +99,12 @@ export default function () {
             <Outlet />
           </main>
           <div
-            className={`${!containsRightSidebar(sidebarState) ? 'w-0' : 'w-[6px]'} cursor-ew-resize bg-gray-200`}
+            className={`${!containsRightSidebar([sidebarState]) ? 'w-0' : 'w-[6px]'} cursor-ew-resize bg-gray-200`}
             onMouseDown={rightMount}
             onMouseUp={rightUnmount}
           />
           <aside
-            className='overflow-y-auto' style={{ width: !containsRightSidebar(sidebarState) ? 0 : rightWidth }}
+            className='overflow-y-auto' style={{ width: !containsRightSidebar([sidebarState]) ? 0 : rightWidth }}
             onKeyUp={e => {
               if (['ArrowRight', 'ArrowLeft'].includes(e.key)) {
                 e.nativeEvent.stopImmediatePropagation();
