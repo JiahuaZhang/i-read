@@ -2,7 +2,6 @@ import { redirect } from '@remix-run/react';
 import { type OAuth2Client } from 'google-auth-library';
 import { google } from 'googleapis';
 import { jwtDecode, type JwtPayload } from 'jwt-decode';
-import keys from './oauth2.keys.json.json';
 
 export type GoogleUser = {
   email: string;
@@ -20,10 +19,8 @@ declare global {
 }
 
 if (!global.google) {
-  const index = process.env.NODE_ENV === 'production' ? 1 : 0;
-
   global.google = {
-    oauth2Client: new google.auth.OAuth2(keys.web.client_id, keys.web.client_secret, keys.web.redirect_uris[index])
+    oauth2Client: new google.auth.OAuth2(process.env.GOOGLE_CLIENT_ID, process.env.GOOGLE_CLIENT_SECRET, process.env.GOOGLE_REDIRECT_URI)
   };
 }
 
