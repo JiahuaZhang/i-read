@@ -40,14 +40,8 @@ export const Editor = () => {
     <LexicalComposer initialConfig={initialConfig} >
       <div className="relative m-4 rounded border-2 border-gray-200 text-xl">
         <RichTextPlugin
-          contentEditable={
-            <ContentEditable className="min-h-[200px] p-2 focus-visible:outline-blue-200" />
-          }
-          placeholder={
-            <div className="pointer-events-none absolute top-0 left-[10px] top-[6px] select-none text-gray-200">
-              Enter some text...
-            </div>
-          }
+          contentEditable={<ContentEditable un-p='2' un-z='10' />}
+          placeholder={<div className='absolute top-[25px] left-[58px]' un-pointer-events='none' >Enter some rich text...</div>}
           ErrorBoundary={LexicalErrorBoundary}
         />
         <ListPlugin />
