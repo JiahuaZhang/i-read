@@ -2,13 +2,12 @@ import { Radio, Space, Tabs } from 'antd';
 import { useRecoilState } from 'recoil';
 import { bookConfigState } from '~/util/state/book.config';
 
-
 const all_english_fonts = [
   "font-Arial",
   "font-Georgia",
   "font-Helvetica",
   "font-Tahoma"
-];
+] as const;
 const all_chinese_fonts = [
   "font-方正黑体",
   "font-方正书宋",
@@ -16,17 +15,15 @@ const all_chinese_fonts = [
   "font-方正楷体",
   "font-思源黑体",
   "font-思源宋体"
-];
+] as const;
 
 export const FontFamilyConfig = () => {
-  const [
-    { config: { chinseFontFamily, englishFontFamily } },
-    setConfig
-  ] = useRecoilState(bookConfigState);
-
-  return (
-    <Tabs centered>
-      <Tabs.TabPane tab="English" key="english">
+  const [{ config: { chinseFontFamily, englishFontFamily } }, setConfig] = useRecoilState(bookConfigState);
+  const items = [
+    {
+      key: 'english',
+      label: 'English',
+      children: <>
         <Radio.Group
           value={englishFontFamily}
           className="grid w-full place-items-center"
@@ -67,8 +64,12 @@ export const FontFamilyConfig = () => {
         <p className={`px-2 indent-0 text-xl ${englishFontFamily}`}>
           The quick brown fox jumped over the lazy dog
         </p>
-      </Tabs.TabPane>
-      <Tabs.TabPane tab="中文" key="chinese">
+      </>
+    },
+    {
+      key: 'chinese',
+      label: '中文',
+      children: <>
         <Radio.Group
           className="grid w-full place-items-center"
           value={chinseFontFamily}
@@ -115,7 +116,9 @@ export const FontFamilyConfig = () => {
           <br />
           闰余成岁，律吕调阳。
         </p>
-      </Tabs.TabPane>
-    </Tabs>
-  );
+      </>
+    }
+  ];
+
+  return <Tabs centered items={items} />;
 };

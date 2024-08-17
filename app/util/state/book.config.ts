@@ -20,7 +20,7 @@ export type BookConfig = {
 
 export const defaultBookConfig: BookConfig = {
   config: {
-    fontSize: 24,
+    fontSize: 22,
     chinseFontFamily: "",
     englishFontFamily: ""
   },
