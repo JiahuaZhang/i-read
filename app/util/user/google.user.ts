@@ -31,7 +31,7 @@ export const getGoogleAuthUrl = () => {
     'https://www.googleapis.com/auth/drive'
   ];
 
-  return redirect(global.google.oauth2Client.generateAuthUrl({ access_type: 'offline', scope }));
+  return redirect(global.google.oauth2Client.generateAuthUrl({ access_type: 'offline', scope, prompt: 'consent' }));
 };
 
 export const getGoogleUser = async (code: string) => {
