@@ -1,45 +1,34 @@
-import type { LinksFunction, MetaFunction } from "@remix-run/node";
 import {
   Links,
-  LiveReload,
   Meta,
   Outlet,
   Scripts,
-  ScrollRestoration
+  ScrollRestoration,
 } from "@remix-run/react";
-import { RecoilRoot } from "recoil";
+import '@unocss/reset/tailwind.css';
+import { RecoilRoot } from 'recoil';
+import 'virtual:uno.css';
 
-import antdCss from "antd/dist/antd.css";
-import tailwindStylesheetUrl from "./styles/tailwind.css";
-
-export const links: LinksFunction = () => {
-  return [
-    { rel: "stylesheet", href: antdCss },
-    { rel: "stylesheet", href: tailwindStylesheetUrl }
-  ];
-};
-
-export const meta: MetaFunction = () => ({
-  charset: "utf-8",
-  title: "iRead",
-  viewport: "width=device-width,initial-scale=1"
-});
-
-export default function App() {
+export function Layout({ children }: { children: React.ReactNode; }) {
   return (
-    <html lang="en" className="h-full">
+    <html lang="en">
       <head>
+        <meta charSet="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
         <Meta />
         <Links />
       </head>
-      <body className="h-full">
+      <body>
         <RecoilRoot>
-          <Outlet />
+          {children}
         </RecoilRoot>
         <ScrollRestoration />
         <Scripts />
-        <LiveReload />
       </body>
     </html>
   );
+}
+
+export default function App() {
+  return <Outlet />;
 }

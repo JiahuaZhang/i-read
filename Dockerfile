@@ -1,48 +1,36 @@
-# base node image
-FROM node:16-bullseye-slim as base
+# Use the official Node.js 18 image as a parent image
+FROM node:20-alpine as build
 
-# set for base and all layer that inherit from it
-ENV NODE_ENV production
+# Set the working directory
+WORKDIR /app
 
-# Install openssl for Prisma
-RUN apt-get update && apt-get install -y openssl
+# Copy package.json and package-lock.json
+COPY package*.json ./
 
-# Install all node_modules, including dev dependencies
-FROM base as deps
+# Install dependencies
+RUN npm ci
 
-WORKDIR /myapp
+# Copy the rest of your app's source code
+COPY . .
 
-ADD package.json package-lock.json ./
-RUN npm install --production=false
-
-# Setup production node_modules
-FROM base as production-deps
-
-WORKDIR /myapp
-
-COPY --from=deps /myapp/node_modules /myapp/node_modules
-ADD package.json package-lock.json ./
-RUN npm prune --production
-
-# Build the app
-FROM base as build
-
-WORKDIR /myapp
-
-COPY --from=deps /myapp/node_modules /myapp/node_modules
-
-ADD . .
+# Build your app
 RUN npm run build
 
-# Finally, build the production image with minimal footprint
-FROM base
+# Use a smaller base image for the final stage
+FROM node:20-alpine
 
-WORKDIR /myapp
+WORKDIR /app
 
-COPY --from=production-deps /myapp/node_modules /myapp/node_modules
+# Copy built assets from the build stage
+COPY --from=build /app/build ./build
+COPY --from=build /app/public ./public
+COPY --from=build /app/package*.json ./
 
-COPY --from=build /myapp/build /myapp/build
-COPY --from=build /myapp/public /myapp/public
-ADD . .
+# Install only production dependencies
+RUN npm ci --only=production
 
-CMD ["npm", "start"]
+# Expose the port your app runs on
+EXPOSE 8080
+
+# Start the app
+CMD ["npm", "run", "start"]

@@ -1,0 +1,53 @@
+import { redirect } from '@remix-run/react';
+import { type OAuth2Client } from 'google-auth-library';
+import { google } from 'googleapis';
+import { jwtDecode, type JwtPayload } from 'jwt-decode';
+import keys from './oauth2.keys.json.json';
+
+export type GoogleUser = {
+  email: string;
+  name: string;
+  picture: string;
+  expiration: Date;
+  access_token: string;
+  refresh_token: string;
+};
+
+declare global {
+  var google: {
+    oauth2Client: OAuth2Client;
+  };
+}
+
+if (!global.google) {
+  const index = process.env.NODE_ENV === 'production' ? 1 : 0;
+
+  global.google = {
+    oauth2Client: new google.auth.OAuth2(keys.web.client_id, keys.web.client_secret, keys.web.redirect_uris[index])
+  };
+}
+
+export const getGoogleAuthUrl = () => {
+  const scope = [
+    'https://www.googleapis.com/auth/userinfo.profile',
+    'https://www.googleapis.com/auth/userinfo.email',
+    'https://www.googleapis.com/auth/drive'
+  ];
+
+  return redirect(global.google.oauth2Client.generateAuthUrl({ access_type: 'offline', scope }));
+};
+
+export const getGoogleUser = async (code: string) => {
+  const { tokens } = await global.google.oauth2Client.getToken(code);
+  global.google.oauth2Client.setCredentials(tokens);
+  const decoded = jwtDecode<{ [key: string]: string; } & JwtPayload>(tokens.id_token!);
+  const { email = '', name = '', picture = '' } = decoded;
+  return {
+    email,
+    name,
+    picture,
+    access_token: tokens.access_token || '',
+    refresh_token: tokens.refresh_token || '',
+    expiration: new Date(tokens.expiry_date!)
+  } as GoogleUser;
+};
