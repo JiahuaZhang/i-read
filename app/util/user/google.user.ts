@@ -36,6 +36,8 @@ export const getGoogleAuthUrl = () => {
 
 export const getGoogleUser = async (code: string) => {
   const { tokens } = await global.google.oauth2Client.getToken(code);
+  console.log('user login with tokens:');
+  console.log(tokens);
   global.google.oauth2Client.setCredentials(tokens);
   const decoded = jwtDecode<{ [key: string]: string; } & JwtPayload>(tokens.id_token!);
   const { email = '', name = '', picture = '' } = decoded;
