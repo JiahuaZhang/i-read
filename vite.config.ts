@@ -5,7 +5,6 @@ import tsconfigPaths from "vite-tsconfig-paths";
 
 export default defineConfig({
   plugins: [
-    UnoCSS(),
     remix({
       future: {
         v3_fetcherPersist: true,
@@ -13,7 +12,7 @@ export default defineConfig({
         v3_throwAbortReason: true,
       },
     }),
+    UnoCSS(),
     tsconfigPaths(),
   ],
-  ssr: {}
 });
