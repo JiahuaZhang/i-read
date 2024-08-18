@@ -29,8 +29,5 @@ COPY --from=build /app/package*.json ./
 # Install only production dependencies
 RUN npm ci --only=production
 
-# Expose the port your app runs on
-EXPOSE 8080
-
 # Start the app
 CMD ["npm", "run", "start"]
