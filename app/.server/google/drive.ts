@@ -1,10 +1,11 @@
 import EPub from 'epub';
 import fs from 'fs';
 import { google } from 'googleapis';
-import path from 'path';
-import os from 'os';
 import { parse } from 'node-html-parser';
 import { type RawAttributes } from 'node-html-parser/dist/nodes/html';
+import os from 'os';
+import path from 'path';
+import { GoogleUser } from '~/util/user/google.user';
 
 declare global {
   var cache: {
@@ -17,21 +18,21 @@ if (!global.cache) {
   global.cache = {};
 }
 
-export const getFolderFiles = async (folder: string) => {
+export const getFolderFiles = async (user: GoogleUser, folder: string) => {
   const drive = google.drive({ version: 'v3' });
-  const { token } = await global.google.oauth2Client.getAccessToken();
-  return (await drive.files.list({ oauth_token: token!, q: `'${folder}' in parents` })).data;
+  return (await drive.files.list({ oauth_token: user.credentials?.access_token!, q: `'${folder}' in parents` })).data;
 };
 
-export const getAllParents = async (folder: string) => {
+export const getAllParents = async (user: GoogleUser, folder: string) => {
   const drive = google.drive({ version: 'v3' });
-  const { token } = await global.google.oauth2Client.getAccessToken();
-
   const list = [];
-
   let fileId = folder;
   while (true) {
-    const { name, id, parents } = (await drive.files.get({ oauth_token: token!, fileId, fields: 'name,parents, id' })).data;
+    const { name, id, parents } = (await drive.files.get({
+      oauth_token: user.credentials?.access_token!,
+      fileId,
+      fields: 'name,parents, id'
+    })).data;
     list.push({ name, id });
     if (!parents) break;
 
@@ -42,14 +43,13 @@ export const getAllParents = async (folder: string) => {
   return list.reverse();
 };
 
-export const getEPub = async (fileId: string) => {
+export const getEPub = async (user: GoogleUser, fileId: string) => {
   if (global.cache.filedId === fileId && global.cache.epub) {
     return global.cache.epub;
   }
 
-  const headers = await global.google.oauth2Client.getRequestHeaders();
   const response = await fetch(`https://www.googleapis.com/drive/v3/files/${fileId}?alt=media`,
-    { headers: new Headers({ Authorization: headers.Authorization }) });
+    { headers: new Headers({ Authorization: `Bearer ${user.credentials?.access_token}` }) });
 
   const filepath = path.join(os.tmpdir(), 'current.epub');
   const data = Buffer.from(await response.arrayBuffer());

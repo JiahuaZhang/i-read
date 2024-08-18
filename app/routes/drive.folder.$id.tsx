@@ -3,21 +3,23 @@ import { Link, MetaFunction, redirect, useLoaderData } from '@remix-run/react';
 import { Breadcrumb } from 'antd';
 import { drive_v3 } from 'googleapis';
 import { getAllParents, getFolderFiles } from '~/.server/google/drive';
+import { requireUser } from '~/.server/session';
 import { FileLink } from '~/component/FileLink';
 import { FolderLink } from '~/component/FolderLink';
 import { isGoogleFolder } from './drive_';
 
 export const meta: MetaFunction = ({ params: { id = '' } }) => [{ title: `Folder ${id}` }];
 
-export const loader: LoaderFunction = async ({ params }) => {
+export const loader: LoaderFunction = async ({ request, params }) => {
   const { id } = params;
 
   if (!id) {
     return redirect("/drive");
   }
 
-  const parents = await getAllParents(id);
-  const kids = await getFolderFiles(id);
+  const user = await requireUser(request);
+  const parents = await getAllParents(user, id);
+  const kids = await getFolderFiles(user, id);
 
   return { parents, kids };
 };

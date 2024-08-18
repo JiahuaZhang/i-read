@@ -1,5 +1,5 @@
 import { redirect } from '@remix-run/react';
-import { type OAuth2Client } from 'google-auth-library';
+import { Credentials, type OAuth2Client } from 'google-auth-library';
 import { google } from 'googleapis';
 import { jwtDecode, type JwtPayload } from 'jwt-decode';
 
@@ -7,21 +7,12 @@ export type GoogleUser = {
   email: string;
   name: string;
   picture: string;
-  expiration: Date;
-  access_token: string;
-  refresh_token: string;
+  credentials?: Credentials;
 };
 
-declare global {
-  var google: {
-    oauth2Client: OAuth2Client;
-  };
-}
-
-if (!global.google) {
-  global.google = {
-    oauth2Client: new google.auth.OAuth2(process.env.GOOGLE_CLIENT_ID, process.env.GOOGLE_CLIENT_SECRET, process.env.GOOGLE_REDIRECT_URI)
-  };
+let oauth2Client: OAuth2Client | null = null;
+if (!oauth2Client) {
+  oauth2Client = new google.auth.OAuth2(process.env.GOOGLE_CLIENT_ID, process.env.GOOGLE_CLIENT_SECRET, process.env.GOOGLE_REDIRECT_URI);
 }
 
 export const getGoogleAuthUrl = () => {
@@ -31,22 +22,13 @@ export const getGoogleAuthUrl = () => {
     'https://www.googleapis.com/auth/drive'
   ];
 
-  return redirect(global.google.oauth2Client.generateAuthUrl({ access_type: 'offline', scope, prompt: 'consent' }));
+  return redirect(oauth2Client.generateAuthUrl({ access_type: 'offline', scope, prompt: 'consent' }));
 };
 
 export const getGoogleUser = async (code: string) => {
-  const { tokens } = await global.google.oauth2Client.getToken(code);
-  console.log('user login with tokens:');
-  console.log(tokens);
-  global.google.oauth2Client.setCredentials(tokens);
+  const { tokens } = await oauth2Client.getToken(code);
+  oauth2Client.setCredentials(tokens);
   const decoded = jwtDecode<{ [key: string]: string; } & JwtPayload>(tokens.id_token!);
   const { email = '', name = '', picture = '' } = decoded;
-  return {
-    email,
-    name,
-    picture,
-    access_token: tokens.access_token || '',
-    refresh_token: tokens.refresh_token || '',
-    expiration: new Date(tokens.expiry_date!)
-  } as GoogleUser;
+  return { email, name, picture, credentials: tokens } as GoogleUser;
 };

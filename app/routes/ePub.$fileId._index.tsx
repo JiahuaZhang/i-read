@@ -5,11 +5,13 @@ import EPub from 'epub';
 import { useEffect } from 'react';
 import { useRecoilValue } from 'recoil';
 import { getEPub } from '~/.server/google/drive';
+import { requireUser } from '~/.server/session';
 import { bookConfigState } from '~/util/state/book.config';
 
-export const loader: LoaderFunction = async ({ params }) => {
+export const loader: LoaderFunction = async ({ request, params }) => {
   const { fileId } = params;
-  return getEPub(fileId!);
+  const user = await requireUser(request);
+  return getEPub(user, fileId!);
 };
 
 export default function Index() {

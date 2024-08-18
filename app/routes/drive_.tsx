@@ -16,8 +16,8 @@ export const isGoogleFolder = (file: drive_v3.Schema$File) =>
 export const meta: MetaFunction = () => [{ title: "Drive" }];
 
 export const loader: LoaderFunction = async ({ request }) => {
-  await requireUser(request);
-  return getFolderFiles("root");
+  const user = await requireUser(request);
+  return getFolderFiles(user, "root");
 };
 
 export default function () {

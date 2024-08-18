@@ -4,6 +4,7 @@ import { Outlet } from '@remix-run/react';
 import { Menu } from 'antd';
 import { useCallback, useState } from 'react';
 import { getEPub } from '~/.server/google/drive';
+import { requireUser } from '~/.server/session';
 import { ConfigPanel } from '~/component/ePub/sideBar/configPanel/ConfigPanel';
 import { Note } from '~/component/ePub/sideBar/Note';
 import TableOfContent from '~/component/ePub/sideBar/TableOfContent';
@@ -11,9 +12,10 @@ import { Editor } from '~/component/lexical.dev/Editor';
 import { RecoilSyncIndexedDB } from '~/component/recoil/RecoilSyncIndexedDB';
 import { useResize } from '~/util/hook/useResize';
 
-export const loader: LoaderFunction = async ({ params }) => {
+export const loader: LoaderFunction = async ({ request, params }) => {
   const { fileId = "" } = params;
-  return getEPub(fileId);
+  const user = await requireUser(request);
+  return getEPub(user, fileId);
 };
 
 enum SidebarState {
