@@ -47,22 +47,20 @@ export default function () {
 
   const menuItems = [
     {
-      label: <MenuOutlined className='p-4' onClick={() => toggleMenu(SidebarState.Menu)} />,
-      key: SidebarState.Menu
+      label: <MenuOutlined className='p-2' onClick={() => toggleMenu(SidebarState.Menu)} />,
+      key: SidebarState.Menu,
     },
     {
-      label: (
-        <SettingOutlined className='p-4' onClick={() => toggleMenu(SidebarState.Config)} />
-      ),
-      key: SidebarState.Config
+      label: <SettingOutlined className='p-2' onClick={() => toggleMenu(SidebarState.Config)} />,
+      key: SidebarState.Config,
     },
     {
-      label: <ProfileOutlined className='p-4' onClick={() => toggleMenu(SidebarState.Note)} />,
-      key: SidebarState.Note
+      label: <ProfileOutlined className='p-2' onClick={() => toggleMenu(SidebarState.Note)} />,
+      key: SidebarState.Note,
     },
     {
-      label: <EditOutlined className='p-4' onClick={() => toggleMenu(SidebarState.MindMap)} />,
-      key: SidebarState.MindMap
+      label: <EditOutlined className='p-2' onClick={() => toggleMenu(SidebarState.MindMap)} />,
+      key: SidebarState.MindMap,
     },
   ];
 
@@ -74,6 +72,7 @@ export default function () {
           selectedKeys={[sidebarState]}
           items={menuItems}
           className='[&>li:nth-last-child(2)]:ml-auto'
+          un-px='2'
         />
 
         <section
