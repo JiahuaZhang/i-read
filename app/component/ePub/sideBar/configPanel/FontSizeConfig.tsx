@@ -1,11 +1,8 @@
-import { useRecoilState } from 'recoil';
-import { bookConfigState } from '~/util/state/book.config';
+import { useAtom } from 'jotai';
+import { bookConfigAtom } from '~/util/state/book.config';
 
 export const FontSizeConfig = () => {
-  const [
-    { config: { fontSize }, },
-    setConfig,
-  ] = useRecoilState(bookConfigState);
+  const [{ config: { fontSize }, }, setConfig,] = useAtom(bookConfigAtom);
 
   return (
     <div

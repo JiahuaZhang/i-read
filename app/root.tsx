@@ -1,6 +1,6 @@
 import { Links, Meta, Outlet, Scripts, ScrollRestoration } from "@remix-run/react";
 import '@unocss/reset/tailwind.css';
-import { RecoilRoot } from 'recoil';
+import { Provider } from 'jotai';
 import 'virtual:uno.css';
 
 export function Layout({ children }: { children: React.ReactNode; }) {
@@ -13,9 +13,9 @@ export function Layout({ children }: { children: React.ReactNode; }) {
         <Links />
       </head>
       <body>
-        <RecoilRoot>
+        <Provider>
           {children}
-        </RecoilRoot>
+        </Provider>
         <ScrollRestoration />
         <Scripts />
       </body>

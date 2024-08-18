@@ -1,12 +1,12 @@
 import { CopyFilled, DeleteFilled } from '@ant-design/icons';
 import { notification } from 'antd';
+import { useAtom, useSetAtom } from 'jotai';
 import { useRef, useState } from 'react';
-import { useRecoilState, useSetRecoilState } from 'recoil';
 import { useEscape } from '~/util/hook/useEscape';
 import { ImageHighlight } from '~/util/selection/ImageNote';
 import { Highlight } from '~/util/selection/note';
 import { TextHighlight } from '~/util/selection/textNote';
-import { highlightState, mainKeyState } from '~/util/state/highlight';
+import { highlightAtom, mainKeyAtom } from '~/util/state/highlight';
 
 const renderHighlight = (highlight: Highlight, index: number, _: Highlight[]) => {
   if (highlight instanceof TextHighlight) {
@@ -33,8 +33,8 @@ const renderHighlight = (highlight: Highlight, index: number, _: Highlight[]) =>
 };
 
 export const Note = () => {
-  const [highlights, setHighlights] = useRecoilState(highlightState);
-  const setMainKey = useSetRecoilState(mainKeyState);
+  const [highlights, setHighlights] = useAtom(highlightAtom);
+  const setMainKey = useSetAtom(mainKeyAtom);
   const [confirmDelte, setConfirmDelte] = useState(false);
   const ref = useRef(null);
   useEscape(ref, () => setConfirmDelte(false));

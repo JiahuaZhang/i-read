@@ -1,12 +1,5 @@
-import { atom } from 'recoil';
+import { atom } from 'jotai';
 import { Highlight } from '../selection/note';
 
-export const highlightState = atom<Highlight[]>({
-  key: 'highlightState',
-  default: []
-});
-
-export const mainKeyState = atom<number>({
-  key: 'mainKeyState',
-  default: 0
-});
+export const highlightAtom = atom<Highlight[]>([]);
+export const mainKeyAtom = atom(0);

@@ -1,6 +1,6 @@
 import { Radio, Space, Tabs } from 'antd';
-import { useRecoilState } from 'recoil';
-import { bookConfigState } from '~/util/state/book.config';
+import { useAtom } from 'jotai';
+import { bookConfigAtom } from '~/util/state/book.config';
 
 const all_english_fonts = [
   "font-Arial",
@@ -18,7 +18,7 @@ const all_chinese_fonts = [
 ] as const;
 
 export const FontFamilyConfig = () => {
-  const [{ config: { chinseFontFamily, englishFontFamily } }, setConfig] = useRecoilState(bookConfigState);
+  const [{ config: { chinseFontFamily, englishFontFamily } }, setConfig] = useAtom(bookConfigAtom);
   const items = [
     {
       key: 'english',

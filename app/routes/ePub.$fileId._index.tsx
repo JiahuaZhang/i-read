@@ -2,11 +2,11 @@ import { LoadingOutlined } from '@ant-design/icons';
 import { LoaderFunction } from '@remix-run/node';
 import { useLoaderData, useNavigate, useParams } from '@remix-run/react';
 import EPub from 'epub';
+import { useAtomValue } from 'jotai';
 import { useEffect } from 'react';
-import { useRecoilValue } from 'recoil';
 import { getEPub } from '~/.server/google/drive';
 import { requireUser } from '~/.server/session';
-import { bookConfigState } from '~/util/state/book.config';
+import { bookConfigAtom } from '~/util/state/book.config';
 
 export const loader: LoaderFunction = async ({ request, params }) => {
   const { fileId } = params;
@@ -17,14 +17,10 @@ export const loader: LoaderFunction = async ({ request, params }) => {
 export default function Index() {
   const book = useLoaderData<EPub>();
   const { fileId } = useParams();
-  const { track: { page = '' } } = useRecoilValue(bookConfigState);
+  const { track: { page = '' } } = useAtomValue(bookConfigAtom);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    navigate(`/ePub/${fileId}/${page || book.flow[0].id}`);
-  }, []);
+  useEffect(() => { navigate(`/ePub/${fileId}/${page || book.flow[0].id}`); }, []);
 
-  return (
-    <LoadingOutlined className='text-8xl m-auto w-full' />
-  );
+  return <LoadingOutlined className='text-8xl m-auto w-full' />;
 }

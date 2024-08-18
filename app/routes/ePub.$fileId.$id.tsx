@@ -2,12 +2,12 @@ import { CloseCircleFilled, DeleteFilled } from '@ant-design/icons';
 import { LoaderFunction } from '@remix-run/node';
 import { MetaFunction, useLoaderData, useParams } from '@remix-run/react';
 import { Checkbox, Modal, notification } from 'antd';
+import { useAtom } from 'jotai';
 import _ from 'lodash';
 import rangy from 'rangy';
 import 'rangy/lib/rangy-classapplier';
 import 'rangy/lib/rangy-highlighter';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { useRecoilState } from 'recoil';
 import { ClientOnly } from 'remix-utils/client-only';
 import { getCurrentEpubChapter } from '~/.server/google/drive';
 import { PageNavigationBar } from '~/component/ePub/PageNavigationBar';
@@ -15,8 +15,8 @@ import '~/component/font.css';
 import { useEscape } from '~/util/hook/useEscape';
 import { ImageHighlight } from '~/util/selection/ImageNote';
 import { isTextNote, TextHighlight } from '~/util/selection/textNote';
-import { bookConfigState } from '~/util/state/book.config';
-import { highlightState, mainKeyState } from '~/util/state/highlight';
+import { bookConfigAtom } from '~/util/state/book.config';
+import { highlightAtom, mainKeyAtom } from '~/util/state/highlight';
 
 export const meta: MetaFunction = ({ params: { id } }) => [{ title: `ePub ${id}` }];
 
@@ -39,9 +39,9 @@ enum ImagePanelDisplay {
 
 const Book = () => {
   const html = useLoaderData();
-  const [bookConfig, setBookConfig] = useRecoilState(bookConfigState);
+  const [bookConfig, setBookConfig] = useAtom(bookConfigAtom);
   const { id = '' } = useParams();
-  const [highlights, setHighlights] = useRecoilState(highlightState);
+  const [highlights, setHighlights] = useAtom(highlightAtom);
   const [needInitHighlights, setNeedInitHighlights] = useState(true);
   const [colorPanelDisplay, setColorPanelDisplay] = useState(ColorPanelDisplay.off);
   const [imagePanelDisplay, setImagePanelDisplay] = useState(ImagePanelDisplay.off);
@@ -49,7 +49,7 @@ const Book = () => {
   const [position, setPosition] = useState({ top: 0, left: 0 });
   const [zoomInImg, setZoomInImg] = useState('');
   const [highlightIndex, setHighlightIndex] = useState(-1);
-  const [key, setKey] = useRecoilState(mainKeyState);
+  const [key, setKey] = useAtom(mainKeyAtom);
   const [highlighter] = useState(() => {
     const highlighter = rangy.createHighlighter();
     default_highlight_colors.forEach(color =>
