@@ -3,9 +3,6 @@ import _ from 'lodash';
 import { BookConfig, defaultBookConfig } from './state/book.config';
 
 const BOOK_CONFIG_TABLE = 'epub-book-config';
-console.log('logging environment variables for fly.io');
-console.log(import.meta.env);
-console.log(process.env);
 const supabase = createClient('https://zepxgzybtlkrokmlavpy.supabase.co', import.meta.env.VITE_SUPABASE_KEY ?? process.env.VITE_SUPABASE_KEY);
 
 export const getBookConfig = async () => {

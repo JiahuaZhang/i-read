@@ -57,3 +57,15 @@ export class ImageHighlight extends Highlight {
     return [this.elements[0].outerHTML];
   }
 }
+
+export const img2blob = (src: string) => {
+  const byteString = atob(src.split(',')[1]);
+  const mimeString = src.split(',')[0].split(':')[1].split(';')[0];
+  const ab = new ArrayBuffer(byteString.length);
+  const ia = new Uint8Array(ab);
+  for (let i = 0; i < byteString.length; i++) {
+    ia[i] = byteString.charCodeAt(i);
+  }
+  const blob = new Blob([ab], { type: mimeString });
+  return { [mimeString]: blob };
+};

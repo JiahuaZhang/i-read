@@ -14,7 +14,7 @@ import { PageNavigationBar } from '~/component/ePub/PageNavigationBar';
 import '~/component/font.css';
 import { getBookConfig, updateBookConfig } from '~/util/database';
 import { useEscape } from '~/util/hook/useEscape';
-import { ImageHighlight } from '~/util/selection/ImageNote';
+import { ImageHighlight, img2blob } from '~/util/selection/ImageNote';
 import { isTextNote, TextHighlight } from '~/util/selection/textNote';
 import { bookConfigAtom } from '~/util/state/book.config';
 import { highlightAtom, mainKeyAtom } from '~/util/state/highlight';
@@ -157,9 +157,7 @@ const Book = () => {
 
           const src = target.getAttribute('src') ?? '';
           setZoomInImg(src);
-          navigator.clipboard.write([
-            new ClipboardItem({ 'text/html': new Blob([target.outerHTML], { type: 'text/html' }) })
-          ]);
+          navigator.clipboard.write([new ClipboardItem(img2blob(src))]);
           notification.success({ message: 'Image copied', duration: 1.5 });
         }}
         onClick={async (event) => {
