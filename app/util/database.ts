@@ -1,4 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
+import _ from 'lodash';
 import { BookConfig, defaultBookConfig } from './state/book.config';
 
 const BOOK_CONFIG_TABLE = 'epub-book-config';
@@ -11,6 +12,7 @@ export const getBookConfig = async () => {
 };
 
 export const updateBookConfig = async (config: BookConfig) => {
+  if (_.isEqual(config, defaultBookConfig)) return;
   await supabase.from(BOOK_CONFIG_TABLE).upsert({ config, id: 1 });
 };
 
