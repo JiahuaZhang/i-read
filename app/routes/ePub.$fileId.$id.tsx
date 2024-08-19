@@ -12,6 +12,7 @@ import { ClientOnly } from 'remix-utils/client-only';
 import { getCurrentEpubChapter } from '~/.server/google/drive';
 import { PageNavigationBar } from '~/component/ePub/PageNavigationBar';
 import '~/component/font.css';
+import { getBookConfig, updateBookConfig } from '~/util/database';
 import { useEscape } from '~/util/hook/useEscape';
 import { ImageHighlight } from '~/util/selection/ImageNote';
 import { isTextNote, TextHighlight } from '~/util/selection/textNote';
@@ -22,7 +23,9 @@ export const meta: MetaFunction = ({ params: { id } }) => [{ title: `ePub ${id}`
 
 export const loader: LoaderFunction = async ({ params }) => {
   const { id } = params;
-  return getCurrentEpubChapter(id!);
+  const config = await getBookConfig();
+  const html = await getCurrentEpubChapter(id!);
+  return { html, config };
 };
 
 export const default_highlight_colors = ['bg-red-600', 'bg-amber-400', 'bg-green-400', 'bg-blue-300', 'bg-purple-400', 'bg-pink-400'] as const;
@@ -38,7 +41,7 @@ enum ImagePanelDisplay {
 }
 
 const Book = () => {
-  const html = useLoaderData();
+  const { html, config } = useLoaderData<typeof loader>();
   const [bookConfig, setBookConfig] = useAtom(bookConfigAtom);
   const { id = '' } = useParams();
   const [highlights, setHighlights] = useAtom(highlightAtom);
@@ -68,6 +71,10 @@ const Book = () => {
     setHighlightIndex(-1);
   });
   useEscape(imagePanelRef, () => setImagePanelDisplay(ImagePanelDisplay.off));
+
+  useEffect(() => setBookConfig(config), [config]);
+
+  useEffect(() => { updateBookConfig(bookConfig); }, [bookConfig]);
 
   useEffect(() => {
     if (id !== bookConfig.track.page) {
