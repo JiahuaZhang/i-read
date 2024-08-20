@@ -96,7 +96,6 @@ export class TextHighlight extends Highlight {
       .map(e => {
         const p = document.createElement('p');
         p.innerHTML = e.innerHTML;
-        p.style.backgroundColor = colors[this.note.className];
         return p.outerHTML;
       });
   }
