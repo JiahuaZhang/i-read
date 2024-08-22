@@ -247,7 +247,7 @@ const Book = () => {
               setKey(value => value + 1);
             }}
           />}
-      </div>;
+      </div>
 
       <Checkbox
         className='absolute p-2 bg-slate-50 rounded border-2 border-violet-600'
@@ -276,7 +276,7 @@ const Book = () => {
         closeIcon={<CloseCircleFilled className='text-rose-600' />}
       >
         <img className="mt-0" src={zoomInImg} />
-      </Modal>;
+      </Modal>
 
     </main>
   );
